@@ -1,0 +1,68 @@
+N: { Inicio , Componentes , Comp , AtribsMapa , AtributoMapa , Planetas  , AtribsPlaneta , AtributoPlaneta ,
+	AtribsNeutrales , AtributoNeu Jugadores , AtribsJugador , AtributoJugador , Ids_Nombre , Dimensiones , Dimension}
+T:  {  }
+S:  {Inicio}
+P:
+
+Inicio 			→ {Componentes}
+Componentes     → Comp , Componentes
+					|Comp 
+Comp 			→ MAPA :  { AtribsMapa }
+					|PLANETAS : [ Planetas ]
+					|PLANETAS_NEUTRALES : [ Planetas ]
+					|JUGADORES : [ Jugadores ]
+AtribsMapa         	→ AtributoMapa , AtribsMapa 
+					| AtributoMapa
+AtributoMapa	→ id : Identificador
+					| tamaño : { Dimensiones }
+					| alAzar : Boolean
+					| planetasNeutrales : Entero
+					| mapaCiego : Boolean
+					| acumular : Boolean
+					| NEUTRALES : { AtribsNeutrales }
+					| finalizacion : Entero
+Planetas           	→ { AtribsPlaneta } , Planetas
+					| { AtribsPlaneta } 
+AtribsPlaneta 	→ AtributoPlaneta , AtribsPlaneta
+					| AtributoPlaneta
+AtributoPlaneta	→ nombre : Id_Nombre
+					| naves : Entero
+					| produccion : Entero
+					| porcentajeMuertes Decimal
+AtribsNeutrales   → AtributoNeu , AtribsNeutrales 
+					| AtributoNeu
+AtributoNeu	→ mostrarNaves : Boolean
+					|mostrarEstadisticas : Boolean
+					|produccion : Entero
+Jugadores		→ { AtribsJugador } , Jugadores
+					| { AtribsJugador }
+AtribsJugador 	→ AtributoJugador , AtribsJugador
+					| AtributoJugador
+AtributoJugador→ nombre : Nombre_Jugador
+					|planetas : [ Ids_Nombre ]
+					|tipo : Tipo
+Ids_Nombre 	→ Id_Nombre , Ids_Nombre
+					| Id_Nombre
+Dimensiones	→ Dimension , Dimension
+Dimension		→ filas : Entero
+					| columnas : Entero
+Boolean		→ true
+					| false
+Tipo			→ HUMANO
+					| FACIL
+					| DIFICIL
+Entero			→Digito Entero
+					|Digito
+Identificador	→ Simbolo id
+					| Letra id
+id				→ Simbolo id
+					| Letra id 
+					| Numero id 
+					| Digito id
+					|
+Id_Nombre		→	Letra (Letra|"")^2
+Decimal		→ Entero . Entero
+Nombre_Jugador→ Letra (Letra|Numero|"")^9
+Simbolo 		→ _|$|-
+Letra			→ [Aa-Zz]
+Digito			→ [0-9]

@@ -1,0 +1,98 @@
+package konquest.cup.Json;
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+ parser code {:
+    public void syntax_error(Symbol s){
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        System.out.println("Error Sintactico Recuperado");
+        System.out.println("\t \tLexema: "+ lexema);
+        System.out.println("\t \tFila: "+ fila);
+        System.out.println("\t \tColumna: "+ columna);
+    }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        System.out.println("Error Sintactico Panic Mode");
+        System.out.println("\t \tLexema: "+ lexema);
+        System.out.println("\t \tFila: "+ fila);
+        System.out.println("\t \tColumna: "+ columna);
+    }
+:}
+action code {:
+
+:}
+
+/* Terminals (tokens returned by the scanner). */
+terminal MAPA , ID , TAMAÑO , FILAS , COLUMNAS , AL_AZAR , TRUE , FALSE , PLANETAS_NEUTRALES_MIN , MAPA_CIEGO , ACUMULAR , NEUTRALES , MOSTRAR_NAVES ,
+         MOSTRAR_ESTADISTICAS , PRODUCCION , FINALIZACION , PLANETAS , NOMBRE , NAVES , PORCENTAJE_MUERTES , PLANETAS_NEUTRALES , 
+         JUGADORES , PLANETASMIN , TIPO , HUMANO , FACIL , DIFICIL , LLAVE_A , LLAVE_C , DOS_PUNTOS , COMA , CORCHETE_A , CORCHETE_C ; 
+terminal String ID_NOMBRE , NOMBRE_JUGADOR , DECIMAL , NUMERO , ID_MAPA ,     ERROR;
+/* Non-terminals */
+non terminal    Inicio , Componentes , Comp , AtribsMapa , AtributoMapa , Planetas  , AtribsPlaneta , AtributoPlaneta ,
+	AtribsNeutrales , AtributoNeu , Jugadores , AtribsJugador , AtributoJugador , Ids_Nombre , Dimensiones , Dimension , Boolean , Tipo;
+
+start with Inicio;
+
+Inicio          ::= LLAVE_A Componentes LLAVE_C ;
+
+Componentes     ::= Comp COMA Componentes
+                    |Comp ;
+ 
+Comp 		::= MAPA DOS_PUNTOS  LLAVE_A AtribsMapa LLAVE_C
+                    |PLANETAS DOS_PUNTOS CORCHETE_A Planetas CORCHETE_C
+                    |PLANETAS_NEUTRALES DOS_PUNTOS CORCHETE_A Planetas CORCHETE_C
+                    |JUGADORES DOS_PUNTOS CORCHETE_A Jugadores CORCHETE_C ;
+
+AtribsMapa      ::= AtributoMapa COMA AtribsMapa 
+                    | AtributoMapa ;
+AtributoMapa	::= ID DOS_PUNTOS ID_MAPA
+                    |ID DOS_PUNTOS NOMBRE_JUGADOR
+                    |ID DOS_PUNTOS ID_NOMBRE
+                    | TAMAÑO DOS_PUNTOS LLAVE_A Dimensiones LLAVE_C
+                    | AL_AZAR DOS_PUNTOS Boolean
+                    | PLANETAS_NEUTRALES_MIN DOS_PUNTOS NUMERO
+                    | MAPA_CIEGO DOS_PUNTOS Boolean
+                    | ACUMULAR DOS_PUNTOS Boolean
+                    | NEUTRALES DOS_PUNTOS LLAVE_A AtribsNeutrales LLAVE_C 
+                    | FINALIZACION DOS_PUNTOS NUMERO ;
+Planetas        ::= LLAVE_A AtribsPlaneta LLAVE_C COMA Planetas
+                    | LLAVE_A AtribsPlaneta LLAVE_C ;
+
+AtribsPlaneta 	::= AtributoPlaneta COMA AtribsPlaneta
+                        | AtributoPlaneta ;
+
+AtributoPlaneta	::= NOMBRE DOS_PUNTOS ID_NOMBRE
+                        | NAVES DOS_PUNTOS NUMERO
+			| PRODUCCION DOS_PUNTOS NUMERO
+			| PORCENTAJE_MUERTES DOS_PUNTOS DECIMAL ;
+
+AtribsNeutrales ::= AtributoNeu COMA AtribsNeutrales 
+			| AtributoNeu ;
+AtributoNeu	::= MOSTRAR_NAVES DOS_PUNTOS Boolean
+			|MOSTRAR_ESTADISTICAS DOS_PUNTOS Boolean
+			|PRODUCCION DOS_PUNTOS NUMERO ;
+
+Jugadores	::= LLAVE_A AtribsJugador LLAVE_C COMA Jugadores
+                    | LLAVE_A AtribsJugador LLAVE_C ;
+AtribsJugador 	::= AtributoJugador COMA AtribsJugador
+                    | AtributoJugador ;
+AtributoJugador ::= NOMBRE DOS_PUNTOS NOMBRE_JUGADOR
+                    |NOMBRE DOS_PUNTOS ID_NOMBRE
+                    |PLANETASMIN DOS_PUNTOS CORCHETE_A Ids_Nombre CORCHETE_C
+                    |TIPO DOS_PUNTOS Tipo ;
+
+Ids_Nombre 	::= ID_NOMBRE COMA Ids_Nombre
+                    | ID_NOMBRE ;
+
+Dimensiones	::= Dimension COMA Dimension ;
+Dimension       ::= FILAS DOS_PUNTOS NUMERO
+                    | COLUMNAS DOS_PUNTOS NUMERO ;
+Boolean		::= TRUE
+                    | FALSE ;
+Tipo            ::= HUMANO
+                    | FACIL
+                    | DIFICIL ;

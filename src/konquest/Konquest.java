@@ -5,6 +5,8 @@
  */
 package konquest;
 
+import konquest.ui.FramePrincipal;
+
 /**
  *
  * @author sergio
@@ -15,7 +17,8 @@ public class Konquest {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        FramePrincipal fp= new FramePrincipal();
+        fp.setVisible(true);
     }
     
 }

@@ -1,0 +1,76 @@
+{
+MAPA:{
+id:"a",
+tamaño: {
+filas:10,
+columnas: 10
+},
+alAzar: false,
+
+planetasNeutrales: 20,
+mapaCiego: false,
+acumular: false ,
+NEUTRALES: {
+mostrarNaves:true,
+mostrarEstadisticas :true,
+produccion: 12
+},
+finalizacion: 50
+},
+PLANETAS: [
+{
+naves: 10,
+produccion: 10,
+porcentajeMuertes:0.44
+},
+{
+nombre: "B",
+naves:15,
+produccion: 9,
+porcentajeMuertes: 0.40
+},
+{
+nombre: "C",
+naves: 15,
+produccion: 12,
+porcentajeMuertes: 0.8
+}
+],
+PLANETAS_NEUTRALES: [
+{
+nombre: "D",
+naves: 15,
+produccion: 12,
+porcentajeMuertes: 0.8
+},
+{
+nombre: "E",
+naves: 11,
+produccion: 9,
+porcentajeMuertes: 0.998501
+},
+{
+nombre: "F",
+naves: 20,
+produccion: 25,
+porcentajeMuertes: 0.21502
+}
+],
+JUGADORES: [
+{
+nombre: "Jose",
+planetas: [
+"A",
+"C"
+],
+tipo: HUMANO
+},
+{
+nombre: "pc1",
+planetas: [
+"B"
+],
+tipo: DIFICIL
+}
+]
+}
