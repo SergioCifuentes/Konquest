@@ -19,7 +19,8 @@ finalizacion: 50
 },
 PLANETAS: [
 {
-naves: 10,
+nombre: "A",
+naves: "B",
 produccion: 10,
 porcentajeMuertes:0.44
 },

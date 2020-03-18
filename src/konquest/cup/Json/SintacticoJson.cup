@@ -1,7 +1,17 @@
 package konquest.cup.Json;
 import java_cup.runtime.Symbol;
 import java.util.ArrayList;
+import konquest.mapa.*;
  parser code {:
+    public boolean error;
+    Mapa mapaResultado;
+    public Mapa getMapa(){
+        return mapaResultado;
+    }
+    void setMapa(Mapa mapa){
+        mapaResultado =mapa;
+    }
+
     public void syntax_error(Symbol s){
         String lexema = s.value.toString();
         int fila = s.right;
@@ -22,29 +32,54 @@ import java.util.ArrayList;
         System.out.println("\t \tColumna: "+ columna);
     }
 :}
+
+init with{:
+    
+:}
+ 
 action code {:
+    private Mapa mapa= new Mapa();
+    private boolean error =false;
+    private Object[] atributosPlaneta = new Object[4];
+
+    private void resetearAtributosPlaneta(){
+        for(int i=0;i<atributosPlaneta.length;i++){
+            atributosPlaneta[i]=null;
+        }
+    }
+    public boolean getError(){
+        return error;
+    }
+    private void mostrarAtributoRepetido(String atributo,Symbol s){
+    System.out.println("El atributo "+atributo+" se encuentra repetido");
+        System.out.println("Fila :"+s.right);
+    System.out.println("Columna :"+s.left);
+
+}
 
 :}
 
 /* Terminals (tokens returned by the scanner). */
 terminal MAPA , ID , TAMAÑO , FILAS , COLUMNAS , AL_AZAR , TRUE , FALSE , PLANETAS_NEUTRALES_MIN , MAPA_CIEGO , ACUMULAR , NEUTRALES , MOSTRAR_NAVES ,
          MOSTRAR_ESTADISTICAS , PRODUCCION , FINALIZACION , PLANETAS , NOMBRE , NAVES , PORCENTAJE_MUERTES , PLANETAS_NEUTRALES , 
-         JUGADORES , PLANETASMIN , TIPO , HUMANO , FACIL , DIFICIL , LLAVE_A , LLAVE_C , DOS_PUNTOS , COMA , CORCHETE_A , CORCHETE_C ; 
-terminal String ID_NOMBRE , NOMBRE_JUGADOR , DECIMAL , NUMERO , ID_MAPA ,     ERROR;
+         JUGADORES , PLANETASMIN , TIPO , HUMANO , FACIL , DIFICIL , DECIMAL, NUMERO , LLAVE_A , LLAVE_C , DOS_PUNTOS , COMA , CORCHETE_A , CORCHETE_C ; 
+terminal String ID_NOMBRE , NOMBRE_JUGADOR  , ID_MAPA ,     ERROR;
+
 /* Non-terminals */
-non terminal    Inicio , Componentes , Comp , AtribsMapa , AtributoMapa , Planetas  , AtribsPlaneta , AtributoPlaneta ,
+non terminal    Inicio , Componentes , Comp , AtribsMapa , AtributoMapa , Planetas  ,PlanetasNeutrales, AtribsPlanetaNeutral , AtribsPlaneta , AtributoPlaneta ,
 	AtribsNeutrales , AtributoNeu , Jugadores , AtribsJugador , AtributoJugador , Ids_Nombre , Dimensiones , Dimension , Boolean , Tipo;
+
 
 start with Inicio;
 
-Inicio          ::= LLAVE_A Componentes LLAVE_C ;
+Inicio          ::= LLAVE_A Componentes LLAVE_C {:asj.setMapa(mapa);asj.error=this.error;:};
 
 Componentes     ::= Comp COMA Componentes
                     |Comp ;
  
-Comp 		::= MAPA DOS_PUNTOS  LLAVE_A AtribsMapa LLAVE_C
+Comp 		::= MAPA DOS_PUNTOS  LLAVE_A AtribsMapa LLAVE_C {::}
                     |PLANETAS DOS_PUNTOS CORCHETE_A Planetas CORCHETE_C
-                    |PLANETAS_NEUTRALES DOS_PUNTOS CORCHETE_A Planetas CORCHETE_C
+                    |PLANETAS_NEUTRALES DOS_PUNTOS CORCHETE_A PlanetasNeutrales CORCHETE_C
                     |JUGADORES DOS_PUNTOS CORCHETE_A Jugadores CORCHETE_C ;
 
 AtribsMapa      ::= AtributoMapa COMA AtribsMapa 
@@ -60,15 +95,56 @@ AtributoMapa	::= ID DOS_PUNTOS ID_MAPA
                     | NEUTRALES DOS_PUNTOS LLAVE_A AtribsNeutrales LLAVE_C 
                     | FINALIZACION DOS_PUNTOS NUMERO ;
 Planetas        ::= LLAVE_A AtribsPlaneta LLAVE_C COMA Planetas
-                    | LLAVE_A AtribsPlaneta LLAVE_C ;
+                    | LLAVE_A AtribsPlaneta LLAVE_C              ;
+
+PlanetasNeutrales ::= LLAVE_A AtribsPlanetaNeutral LLAVE_C COMA PlanetasNeutrales
+                                                                 
+                    | LLAVE_A AtribsPlanetaNeutral LLAVE_C                     ;
+
 
 AtribsPlaneta 	::= AtributoPlaneta COMA AtribsPlaneta
-                        | AtributoPlaneta ;
+                        | AtributoPlaneta   {:        if(Planeta.verificarObligatorios(atributosPlaneta)){
+                                                                        Planeta planeta = new Planeta(atributosPlaneta);
+                                                                        
+                                                                    }else{
+                                                                    error=true;} 
+                                                                    resetearAtributosPlaneta();:} 
+                       |error COMA AtribsPlaneta
+                       |error   {:        if(Planeta.verificarObligatorios(atributosPlaneta)){
+                                                                        Planeta planeta = new Planeta(atributosPlaneta);
+                                                                        
+                                                                    }else{
+                                                                    error=true;}
+                                                                    resetearAtributosPlaneta(); :} ;
 
-AtributoPlaneta	::= NOMBRE DOS_PUNTOS ID_NOMBRE
-                        | NAVES DOS_PUNTOS NUMERO
-			| PRODUCCION DOS_PUNTOS NUMERO
-			| PORCENTAJE_MUERTES DOS_PUNTOS DECIMAL ;
+AtribsPlanetaNeutral 	::= AtributoPlaneta COMA AtribsPlanetaNeutral
+                        | AtributoPlaneta {:if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
+                                                                        PlanetaNeutral planeta = new PlanetaNeutral(atributosPlaneta);
+                                                                           resetearAtributosPlaneta(); 
+                                                                        }else{
+                                                                            error=true;
+                                                                        }:};
+
+AtributoPlaneta	::= NOMBRE DOS_PUNTOS ID_NOMBRE:nombre {:if(atributosPlaneta[0]==null){
+                                                        atributosPlaneta[0]=(String)nombre;
+                                                        }else{
+                                                             mostrarAtributoRepetido("Nombre",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                        }:}
+                        | NAVES DOS_PUNTOS NUMERO:num    {:if(atributosPlaneta[1]==null){
+                                                                atributosPlaneta[1]=Integer.valueOf((String)num);
+                                                            }else{
+                                                                 mostrarAtributoRepetido("Naves",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                            }:}    
+			| PRODUCCION DOS_PUNTOS NUMERO:num{:if(atributosPlaneta[2]==null){
+                                                                atributosPlaneta[2]=Integer.valueOf((String)num);
+                                                            }else{
+                                                                 mostrarAtributoRepetido("Produccion",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                            }:}
+			| PORCENTAJE_MUERTES DOS_PUNTOS DECIMAL:num {:if(atributosPlaneta[3]==null){
+                                                                atributosPlaneta[3]=Double.valueOf((String)num);
+                                                            }else{
+                                                                 mostrarAtributoRepetido("Porcentaje Muertes",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                            }:};
 
 AtribsNeutrales ::= AtributoNeu COMA AtribsNeutrales 
 			| AtributoNeu ;

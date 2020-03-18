@@ -11,10 +11,19 @@ package konquest.mapa;
  */
 public class PlanetaNeutral extends Planeta{
     
-    public PlanetaNeutral(String nombre, int naves, int produccion, float porcentajeMuertes) {
-        super(nombre, naves, produccion, porcentajeMuertes);
+    public PlanetaNeutral(Object[] atributos) {
+        super(atributos);
         setOwner(null);
     }
+    public static boolean verificarObligatorios(Object[] atributos){
+        for (int i = 0; i < 4; i++) {
+            if (i!=3&&(atributos[i]==null||atributos[i]=="")) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
     
     
     

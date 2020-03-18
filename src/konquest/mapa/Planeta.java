@@ -13,15 +13,22 @@ public class Planeta {
     private String nombre;
     private int naves;
     private int produccion;
-    private float porcentajeMuertes;
+    private double porcentajeMuertes;
     private Jugador owner;
     
-    
-    public Planeta(String nombre, int naves, int produccion, float porcentajeMuertes) {
-        this.nombre = nombre;
-        this.naves = naves;
-        this.produccion = produccion;
-        this.porcentajeMuertes = porcentajeMuertes;
+    public static boolean verificarObligatorios(Object[] atributos){
+        for (int i = 0; i < 4; i++) {
+            if (atributos[i]==null||atributos[i]=="") {
+                return false;
+            }
+        }
+        return true;
+    }
+    public Planeta(Object[] atributos) {
+        this.nombre = (String)atributos[0];
+        this.naves = (Integer)atributos[1];
+        this.produccion = (Integer)atributos[2];
+        this.porcentajeMuertes = (Double)atributos[3];
     }
 
     public Jugador getOwner() {
@@ -45,7 +52,7 @@ public class Planeta {
         return produccion;
     }
 
-    public float getPorcentajeMuertes() {
+    public double getPorcentajeMuertes() {
         return porcentajeMuertes;
     }
     

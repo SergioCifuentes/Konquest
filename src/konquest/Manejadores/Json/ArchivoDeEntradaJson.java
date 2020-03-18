@@ -36,7 +36,15 @@ public class ArchivoDeEntradaJson {
                 AnalizadorLexicoJson alj = new AnalizadorLexicoJson(br);
                 AnalizadorSintacticoJson asj = new AnalizadorSintacticoJson(alj);
                 asj.parse();
+                if (asj.error) {
 
+                } else {
+                    Mapa mapa = new Mapa();
+                    ManejadorDeCasillas mc = new ManejadorDeCasillas();
+                    mapa.setCasillas(mc.generarCasillas(8, 5));
+                    DibujadorDeTablero ddt = new DibujadorDeTablero();
+                    ddt.dibujarTablero(mapa, frame.getJPanel());
+                }
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -44,11 +52,7 @@ public class ArchivoDeEntradaJson {
             } catch (Exception ex) {
                 Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Mapa mapa = new Mapa();
-            ManejadorDeCasillas mc= new ManejadorDeCasillas();
-            mapa.setCasillas(mc.generarCasillas(8, 5));
-            DibujadorDeTablero ddt = new DibujadorDeTablero();
-            ddt.dibujarTablero(mapa, frame.getJPanel());
+
         } else {
             JOptionPane.showMessageDialog(frame, "El Archivo Debe Ser '.Json'", "Error Al Cargar", JOptionPane.ERROR_MESSAGE);
         }

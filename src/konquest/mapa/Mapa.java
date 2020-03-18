@@ -5,6 +5,8 @@
  */
 package konquest.mapa;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author sergio
@@ -13,10 +15,13 @@ public class Mapa {
     private String id;
     private Casilla[][] casillas;
     private boolean alAzar =false;
-    private int planetasNeutrales;
+    private int numeroPlanetasNeutrales;
     private boolean mapaCiego=false;
     private boolean acumular=false;
     private ConfiguracionNeutrales confiNeutrales;
+    private ArrayList<Planeta> planetas;
+    private ArrayList<Planeta> planetasNeutrales;
+    private ArrayList<Jugador> jugadores;
     private Integer finalizado;
 
     public String getId() {
@@ -36,7 +41,7 @@ public class Mapa {
     }
 
     public int getPlanetasNeutrales() {
-        return planetasNeutrales;
+        return numeroPlanetasNeutrales;
     }
 
     public boolean isMapaCiego() {
