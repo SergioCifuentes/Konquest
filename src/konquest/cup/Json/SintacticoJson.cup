@@ -1,10 +1,18 @@
 package konquest.cup.Json;
+import java.awt.Dimension;
 import java_cup.runtime.Symbol;
 import java.util.ArrayList;
+import konquest.ui.FramePrincipal;
 import konquest.mapa.*;
  parser code {:
     public boolean error;
-    Mapa mapaResultado;
+    public boolean errorRecuperable;
+    private Mapa mapaResultado;
+    protected FramePrincipal fp;
+    public  void setFrame(FramePrincipal frame){
+        fp =frame;
+    }
+
     public Mapa getMapa(){
         return mapaResultado;
     }
@@ -16,46 +24,62 @@ import konquest.mapa.*;
         String lexema = s.value.toString();
         int fila = s.right;
         int columna = s.left;
-        System.out.println("Error Sintactico Recuperado");
-        System.out.println("\t \tLexema: "+ lexema);
-        System.out.println("\t \tFila: "+ fila);
-        System.out.println("\t \tColumna: "+ columna);
+        fp.agregarTextoAcciones("Error Sintactico Recuperado\n");
+        fp.agregarTextoAcciones("\t \tLexema: "+ lexema+"\n");
+        fp.agregarTextoAcciones("\t \tFila: "+ fila+"\n");
+        fp.agregarTextoAcciones("\t \tColumna: "+ columna+"\n");
     }
 
     public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
         String lexema = s.value.toString();
         int fila = s.right;
         int columna = s.left;
-        System.out.println("Error Sintactico Panic Mode");
-        System.out.println("\t \tLexema: "+ lexema);
-        System.out.println("\t \tFila: "+ fila);
-        System.out.println("\t \tColumna: "+ columna);
+        fp.agregarTextoAcciones("Error Sintactico Panic Mode\n");
+        fp.agregarTextoAcciones("\t \tLexema: "+ lexema+"\n");
+        fp.agregarTextoAcciones("\t \tFila: "+ fila+"\n");
+        fp.agregarTextoAcciones("\t \tColumna: "+ columna+"\n");
     }
 :}
 
 init with{:
-    
+   
 :}
  
 action code {:
-    private Mapa mapa= new Mapa();
+    private Mapa mapa;
+    private Dimension dimensionMapa=new Dimension();
     private boolean error =false;
+    private boolean errorRecuperable=false;
+    private Object[] atributosMapa = new Object[8];
     private Object[] atributosPlaneta = new Object[4];
-
+    private Object[] atributosJugador = new Object[3];
+    private ArrayList<Object> componentesPrincipales = new ArrayList<>();
+    private void resetearAtributosMapa(){
+        for(int i=0;i<atributosMapa.length;i++){
+            atributosMapa[i]=null;
+        }
+    }
     private void resetearAtributosPlaneta(){
         for(int i=0;i<atributosPlaneta.length;i++){
             atributosPlaneta[i]=null;
         }
     }
+    private void resetearAtributosJugador(){
+        for(int i=0;i<atributosJugador.length;i++){
+            atributosJugador[i]=null;
+        }
+    }
     public boolean getError(){
         return error;
     }
-    private void mostrarAtributoRepetido(String atributo,Symbol s){
-    System.out.println("El atributo "+atributo+" se encuentra repetido");
-        System.out.println("Fila :"+s.right);
-    System.out.println("Columna :"+s.left);
+    protected void mostrarAtributoRepetido(String atributo, Symbol s,AnalizadorSintacticoJson asj) {
 
-}
+        asj.fp.agregarTextoAcciones("El atributo " + atributo + " se encuentra repetido\n");
+
+        asj.fp.agregarTextoAcciones("\t \tFila: " + s.right + "\n");
+        asj.fp.agregarTextoAcciones("\t \tColumna: " + s.left + "\n");
+
+    }
 
 :}
 
@@ -72,103 +96,322 @@ non terminal    Inicio , Componentes , Comp , AtribsMapa , AtributoMapa , Planet
 
 start with Inicio;
 
-Inicio          ::= LLAVE_A Componentes LLAVE_C {:asj.setMapa(mapa);asj.error=this.error;:};
+Inicio          ::= LLAVE_A Componentes LLAVE_C {:if(!Mapa.comprobarComponetesDeConstruicion(componentesPrincipales,asj.fp)){
+                                                    mapa=Mapa.construirMapa(componentesPrincipales);
+                                                      if(!Mapa.verificacionesFinales(mapa,asj.fp)){asj.setMapa(mapa);}else{error=true;}
+                                                    }else{error=true;}
+                                                        
+                                                                           asj.error=this.error;asj.errorRecuperable=this.errorRecuperable;:};
 
-Componentes     ::= Comp COMA Componentes
-                    |Comp ;
+Componentes     ::= Comp:comp COMA Componentes   {:componentesPrincipales.add(comp);:}
+                    |Comp:comp {:componentesPrincipales.add(comp);:};
  
-Comp 		::= MAPA DOS_PUNTOS  LLAVE_A AtribsMapa LLAVE_C {::}
-                    |PLANETAS DOS_PUNTOS CORCHETE_A Planetas CORCHETE_C
-                    |PLANETAS_NEUTRALES DOS_PUNTOS CORCHETE_A PlanetasNeutrales CORCHETE_C
-                    |JUGADORES DOS_PUNTOS CORCHETE_A Jugadores CORCHETE_C ;
+Comp 		::= MAPA DOS_PUNTOS  LLAVE_A AtribsMapa:map LLAVE_C {:RESULT= map;:}
+                    |PLANETAS DOS_PUNTOS CORCHETE_A Planetas:planetas CORCHETE_C    {:RESULT = planetas;:}
+                    |PLANETAS_NEUTRALES DOS_PUNTOS CORCHETE_A PlanetasNeutrales:planetasNeutrales CORCHETE_C {:RESULT = planetasNeutrales;:}
+                    |JUGADORES DOS_PUNTOS CORCHETE_A Jugadores:jugadores CORCHETE_C {:RESULT=jugadores;:};
 
-AtribsMapa      ::= AtributoMapa COMA AtribsMapa 
-                    | AtributoMapa ;
-AtributoMapa	::= ID DOS_PUNTOS ID_MAPA
-                    |ID DOS_PUNTOS NOMBRE_JUGADOR
-                    |ID DOS_PUNTOS ID_NOMBRE
-                    | TAMAÑO DOS_PUNTOS LLAVE_A Dimensiones LLAVE_C
-                    | AL_AZAR DOS_PUNTOS Boolean
-                    | PLANETAS_NEUTRALES_MIN DOS_PUNTOS NUMERO
-                    | MAPA_CIEGO DOS_PUNTOS Boolean
-                    | ACUMULAR DOS_PUNTOS Boolean
-                    | NEUTRALES DOS_PUNTOS LLAVE_A AtribsNeutrales LLAVE_C 
-                    | FINALIZACION DOS_PUNTOS NUMERO ;
-Planetas        ::= LLAVE_A AtribsPlaneta LLAVE_C COMA Planetas
-                    | LLAVE_A AtribsPlaneta LLAVE_C              ;
+AtribsMapa      ::= AtributoMapa COMA AtribsMapa:re {:RESULT = re;:} 
+                    | AtributoMapa {:        if(Mapa.verificarObligatorios(atributosMapa,asj.fp)){
+                                                                        Mapa mapa = new Mapa(atributosMapa);
+                                                                       RESULT = mapa;
 
-PlanetasNeutrales ::= LLAVE_A AtribsPlanetaNeutral LLAVE_C COMA PlanetasNeutrales
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosMapa();:} 
+                       |error COMA AtribsMapa:re {:RESULT =re;errorRecuperable=true;:}
+                       |error   {: errorRecuperable=true;       if(Mapa.verificarObligatorios(atributosMapa,asj.fp)){
+                                                                        Mapa mapa = new Mapa(atributosMapa);
+                                                                       RESULT = mapa;
+
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosMapa();:};
+
+
+
+
+
+AtributoMapa	::= ID DOS_PUNTOS ID_MAPA:id   {:if(atributosMapa[0]==null){
+                                                        atributosMapa[0]=(String)id;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Id Mapa",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    |ID DOS_PUNTOS NOMBRE_JUGADOR:id   {:if(atributosMapa[0]==null){
+                                                        atributosMapa[0]=(String)id;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Id Mapa",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    |ID DOS_PUNTOS ID_NOMBRE:id    {:if(atributosMapa[0]==null){
+                                                        atributosMapa[0]=(String)id;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Id Mapa",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    | TAMAÑO DOS_PUNTOS LLAVE_A Dimensiones:dimension LLAVE_C     {:if(atributosMapa[1]==null){
+                                                        atributosMapa[1]=(Dimension)dimension;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("tamaño",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    | AL_AZAR DOS_PUNTOS Boolean:bool       {:if(atributosMapa[2]==null){
+                                                        atributosMapa[2]=(Boolean)bool;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("AL Azar",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    | PLANETAS_NEUTRALES_MIN DOS_PUNTOS NUMERO:num  {:if(atributosMapa[3]==null){
+                                                        atributosMapa[3]=Integer.valueOf((String)num);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("AL Azar",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    | MAPA_CIEGO DOS_PUNTOS Boolean:bool         {:if(atributosMapa[4]==null){
+                                                        atributosMapa[4]=(Boolean)bool;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("AL Azar",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    | ACUMULAR DOS_PUNTOS Boolean:bool           {:if(atributosMapa[5]==null){
+                                                        atributosMapa[5]=(Boolean)bool;
+                                                        }else{
+                                                                errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Acumular",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    | NEUTRALES DOS_PUNTOS LLAVE_A AtribsNeutrales:conf LLAVE_C  {:if(atributosMapa[6]==null){
+                                                        atributosMapa[6]=(ConfiguracionNeutrales)conf;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Neutrales",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    | FINALIZACION DOS_PUNTOS NUMERO:num  {:if(atributosMapa[7]==null){
+                                                        atributosMapa[7]=Integer.valueOf((String)num);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Finalizar",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:} ;
+
+
+Planetas        ::= LLAVE_A AtribsPlaneta:planeta LLAVE_C COMA Planetas:planetas     {:
+                                                                                ArrayList<Planeta> planetasNuevas= new ArrayList<>();
+                                                                                if(planeta!=null){
+                                                                        planetasNuevas.add((Planeta) planeta);
+                                                                        }
+                                                                        for(int i=0;i<((ArrayList<Planeta>)planetas).size();i++){
+                                                                        planetasNuevas.add(((ArrayList<Planeta>)planetas).get(i));
+                                                                         }
+                                                                         RESULT= planetasNuevas;:}
+                    | LLAVE_A AtribsPlaneta:planeta LLAVE_C            {:
+                                                                        ArrayList<Planeta> planetasNuevas= new ArrayList<>();
+                                                                        if(planeta!=null){
+                                                                        planetasNuevas.add((Planeta) planeta);
+                                                                        
+                                                                        } RESULT= planetasNuevas;:}  ;
+
+PlanetasNeutrales ::= LLAVE_A AtribsPlanetaNeutral:planeta LLAVE_C COMA PlanetasNeutrales:planetas  {:
+                                                                                ArrayList<PlanetaNeutral> planetasNuevas= new ArrayList<>();
+                                                                                if(planeta!=null){
+                                                                        planetasNuevas.add((PlanetaNeutral) planeta);
+                                                                        }
+                                                                        for(int i=0;i<((ArrayList<PlanetaNeutral>)planetas).size();i++){
+                                                                        planetasNuevas.add(((ArrayList<PlanetaNeutral>)planetas).get(i));
+                                                                         }
+                                                                         RESULT= planetasNuevas;:}
                                                                  
-                    | LLAVE_A AtribsPlanetaNeutral LLAVE_C                     ;
+                    | LLAVE_A AtribsPlanetaNeutral:planeta LLAVE_C       {:ArrayList<PlanetaNeutral> planetasNuevas= new ArrayList<>();
+                                                                        
+                                                                            if(planeta!=null){
+                                                                        planetasNuevas.add((PlanetaNeutral) planeta);
+                                                                        
+                                                                         }RESULT= planetasNuevas;:}              ;
 
 
-AtribsPlaneta 	::= AtributoPlaneta COMA AtribsPlaneta
+AtribsPlaneta 	::= AtributoPlaneta COMA AtribsPlaneta:re {:RESULT =re;:}
                         | AtributoPlaneta   {:        if(Planeta.verificarObligatorios(atributosPlaneta)){
                                                                         Planeta planeta = new Planeta(atributosPlaneta);
-                                                                        
+                                                                       RESULT = planeta;
+
                                                                     }else{
-                                                                    error=true;} 
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;} 
                                                                     resetearAtributosPlaneta();:} 
-                       |error COMA AtribsPlaneta
+                       |error COMA AtribsPlaneta:re {:RESULT =re;:}
                        |error   {:        if(Planeta.verificarObligatorios(atributosPlaneta)){
                                                                         Planeta planeta = new Planeta(atributosPlaneta);
-                                                                        
+                                                                        RESULT = planeta;
                                                                     }else{
-                                                                    error=true;}
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;}
                                                                     resetearAtributosPlaneta(); :} ;
 
-AtribsPlanetaNeutral 	::= AtributoPlaneta COMA AtribsPlanetaNeutral
-                        | AtributoPlaneta {:if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
+AtribsPlanetaNeutral 	::= AtributoPlaneta COMA AtribsPlanetaNeutral:re {:RESULT =re;:}
+                        | AtributoPlaneta {:        if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
                                                                         PlanetaNeutral planeta = new PlanetaNeutral(atributosPlaneta);
-                                                                           resetearAtributosPlaneta(); 
-                                                                        }else{
-                                                                            error=true;
-                                                                        }:};
+                                                                       RESULT = planeta;
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();:} 
+                       |error COMA AtribsPlanetaNeutral:re {:errorRecuperable=true;RESULT =re;:}
+                       |error   {:      errorRecuperable=true;  if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
+                                                                        PlanetaNeutral planeta = new PlanetaNeutral(atributosPlaneta);
+                                                                        RESULT = planeta;
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;}
+                                                                    resetearAtributosPlaneta(); :} ;
 
 AtributoPlaneta	::= NOMBRE DOS_PUNTOS ID_NOMBRE:nombre {:if(atributosPlaneta[0]==null){
                                                         atributosPlaneta[0]=(String)nombre;
                                                         }else{
-                                                             mostrarAtributoRepetido("Nombre",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Nombre",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
                                                         }:}
                         | NAVES DOS_PUNTOS NUMERO:num    {:if(atributosPlaneta[1]==null){
                                                                 atributosPlaneta[1]=Integer.valueOf((String)num);
                                                             }else{
-                                                                 mostrarAtributoRepetido("Naves",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                                errorRecuperable=true;
+                                                                 mostrarAtributoRepetido("Naves",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
                                                             }:}    
 			| PRODUCCION DOS_PUNTOS NUMERO:num{:if(atributosPlaneta[2]==null){
                                                                 atributosPlaneta[2]=Integer.valueOf((String)num);
                                                             }else{
-                                                                 mostrarAtributoRepetido("Produccion",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                                errorRecuperable=true;
+                                                                 mostrarAtributoRepetido("Produccion",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
                                                             }:}
 			| PORCENTAJE_MUERTES DOS_PUNTOS DECIMAL:num {:if(atributosPlaneta[3]==null){
                                                                 atributosPlaneta[3]=Double.valueOf((String)num);
                                                             }else{
-                                                                 mostrarAtributoRepetido("Porcentaje Muertes",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()));
+                                                                errorRecuperable=true;
+                                                                 mostrarAtributoRepetido("Porcentaje Muertes",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
                                                             }:};
 
-AtribsNeutrales ::= AtributoNeu COMA AtribsNeutrales 
-			| AtributoNeu ;
-AtributoNeu	::= MOSTRAR_NAVES DOS_PUNTOS Boolean
-			|MOSTRAR_ESTADISTICAS DOS_PUNTOS Boolean
-			|PRODUCCION DOS_PUNTOS NUMERO ;
 
-Jugadores	::= LLAVE_A AtribsJugador LLAVE_C COMA Jugadores
-                    | LLAVE_A AtribsJugador LLAVE_C ;
-AtribsJugador 	::= AtributoJugador COMA AtribsJugador
-                    | AtributoJugador ;
-AtributoJugador ::= NOMBRE DOS_PUNTOS NOMBRE_JUGADOR
-                    |NOMBRE DOS_PUNTOS ID_NOMBRE
-                    |PLANETASMIN DOS_PUNTOS CORCHETE_A Ids_Nombre CORCHETE_C
-                    |TIPO DOS_PUNTOS Tipo ;
+AtribsNeutrales ::= AtributoNeu COMA AtribsNeutrales:re {:RESULT =re;:}
+			| AtributoNeu {:        if(ConfiguracionNeutrales.verificarObligatorios(atributosPlaneta)){
+                                                                        ConfiguracionNeutrales confi = new ConfiguracionNeutrales(atributosPlaneta);
+                                                                       RESULT = confi;
 
-Ids_Nombre 	::= ID_NOMBRE COMA Ids_Nombre
-                    | ID_NOMBRE ;
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();:} 
+                       |error COMA AtribsNeutrales:re {:errorRecuperable=true;RESULT =re;:}
+                       |error   {:      errorRecuperable=true;  if(ConfiguracionNeutrales.verificarObligatorios(atributosPlaneta)){
+                                                                        ConfiguracionNeutrales confi = new ConfiguracionNeutrales(atributosPlaneta);
+                                                                        RESULT = confi;
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;}
+                                                                    resetearAtributosPlaneta(); :} ;
 
-Dimensiones	::= Dimension COMA Dimension ;
-Dimension       ::= FILAS DOS_PUNTOS NUMERO
-                    | COLUMNAS DOS_PUNTOS NUMERO ;
-Boolean		::= TRUE
-                    | FALSE ;
-Tipo            ::= HUMANO
-                    | FACIL
-                    | DIFICIL ;
+
+AtributoNeu	::= MOSTRAR_NAVES DOS_PUNTOS Boolean: bool   {:if(atributosPlaneta[0]==null){
+                                                        atributosPlaneta[0]=(Boolean)bool;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Mostrar Naves",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                        }:}
+			|MOSTRAR_ESTADISTICAS DOS_PUNTOS Boolean:bool    {:if(atributosPlaneta[1]==null){
+                                                        atributosPlaneta[1]=(Boolean)bool;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Mostrar Estadisticas",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                        }:}
+			|PRODUCCION DOS_PUNTOS NUMERO:num  {:if(atributosPlaneta[2]==null){
+                                                        atributosPlaneta[2]=Integer.valueOf((String)num);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Produccion",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                        }:};
+
+Jugadores	::= LLAVE_A AtribsJugador:jugador LLAVE_C COMA Jugadores:jugadores   {:
+                                                                                ArrayList<Jugador> jugadoresNuevos = new ArrayList<>();
+                                                                                if(jugador!=null){
+                                                                        jugadoresNuevos.add((Jugador) jugador);
+                                                                        }
+                                                                        for(int i=0;i<((ArrayList<Jugador>)jugadores).size();i++){
+                                                                        jugadoresNuevos.add(((ArrayList<Jugador>)jugadores).get(i));
+                                                                         }
+                                                                         RESULT= jugadoresNuevos;:}
+                    | LLAVE_A AtribsJugador:jugador LLAVE_C {:
+                                                                        ArrayList<Jugador> jugadores= new ArrayList<>();
+                                                                        if(jugador!=null){
+                                                                        jugadores.add((Jugador) jugador);
+                                                                        } RESULT= jugadores;:}  ;
+
+
+
+AtribsJugador 	::= AtributoJugador COMA AtribsJugador:re {:RESULT =re;:}
+                    | AtributoJugador {:        if(Jugador.verificarObligatorios(atributosJugador)){
+                                                                        Jugador jugador = new Jugador(atributosJugador);
+                                                                       RESULT =jugador;
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosJugador();:} 
+                       |error COMA AtribsJugador:re {:errorRecuperable=true;RESULT =re;:}
+                       |error   {:       errorRecuperable=true; if(Jugador.verificarObligatorios(atributosJugador)){
+                                                                        Jugador jugador = new Jugador(atributosJugador);
+                                                                       RESULT =jugador;
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosJugador();:}  ;
+AtributoJugador ::= NOMBRE DOS_PUNTOS NOMBRE_JUGADOR:nombre  {:if(atributosJugador[0]==null){
+                                                        atributosJugador[0]=(String)nombre;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Nombre Jugador",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                   |NOMBRE DOS_PUNTOS ID_NOMBRE:nombre  {:if(atributosJugador[0]==null){
+                                                        atributosJugador[0]=(String)nombre;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Nombre Jugador",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    |PLANETASMIN DOS_PUNTOS CORCHETE_A Ids_Nombre:planetas CORCHETE_C   
+                                                        {:if(atributosJugador[1]==null){
+                                                        atributosJugador[1]=(ArrayList<String>)planetas;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Planetas De Jugador",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:}
+                    |TIPO DOS_PUNTOS Tipo:tipo  {:if(atributosJugador[2]==null){
+                                                        atributosJugador[2]=(Integer)tipo;
+                                                        }else{
+                                                              errorRecuperable=true;
+                                                            mostrarAtributoRepetido("Nombre Jugador",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
+                                                       }:};
+
+Ids_Nombre 	::= ID_NOMBRE:nom COMA Ids_Nombre:nombres   {:ArrayList<String> planetas = new ArrayList<>();
+                                                            if(nom!=null){planetas.add((String)nom);}
+                                                            for(int i=0;i<((ArrayList<String>)nombres).size();i++){
+                                                                        planetas.add(((ArrayList<String>)nombres).get(i));
+                                                                         }
+                                                            RESULT = planetas;:}
+                    | ID_NOMBRE:nom {:ArrayList<String> planetas = new ArrayList<>();
+                                        if(nom!=null){planetas.add((String)nom);}
+                                        RESULT = planetas;:};
+
+Dimensiones	::= Dimension COMA Dimension {:RESULT = dimensionMapa;:};
+Dimension       ::= FILAS DOS_PUNTOS NUMERO:num {:if(dimensionMapa.height==0){
+                                                    dimensionMapa.height=Integer.valueOf((String)num);}else{
+                                                        errorRecuperable=true;
+                                                      mostrarAtributoRepetido("Fila",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);}:}
+                    | COLUMNAS DOS_PUNTOS NUMERO:num    {:if(dimensionMapa.width==0){
+                                                    dimensionMapa.width=Integer.valueOf((String)num);}else{
+                                                        errorRecuperable=true;
+                                                      mostrarAtributoRepetido("Columna",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);}:} ;
+Boolean		::= TRUE    {:RESULT=true;:}
+                    | FALSE {:RESULT=false;:};
+Tipo            ::= HUMANO{:RESULT=Jugador.TIPO_HUMANO;:}
+                    | FACIL{:RESULT=Jugador.TIPO_FACIL;:}
+                    | DIFICIL {:RESULT=Jugador.TIPO_DIFICIL;:};

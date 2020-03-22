@@ -5,6 +5,9 @@
  */
 package konquest.mapa;
 
+import java.util.ArrayList;
+import konquest.ui.FramePrincipal;
+
 /**
  *
  * @author sergio
@@ -12,7 +15,7 @@ package konquest.mapa;
 public class Planeta {
     private String nombre;
     private int naves;
-    private int produccion;
+    private Integer produccion;
     private double porcentajeMuertes;
     private Jugador owner;
     
@@ -25,7 +28,8 @@ public class Planeta {
         return true;
     }
     public Planeta(Object[] atributos) {
-        this.nombre = (String)atributos[0];
+        String aux = ((String)atributos[0]).substring(1,((String)atributos[0]).length()-1);
+        this.nombre = aux;
         this.naves = (Integer)atributos[1];
         this.produccion = (Integer)atributos[2];
         this.porcentajeMuertes = (Double)atributos[3];
@@ -48,13 +52,31 @@ public class Planeta {
         return naves;
     }
 
-    public int getProduccion() {
+    public Integer getProduccion() {
         return produccion;
+    }
+
+    public void setProduccion(Integer produccion) {
+        this.produccion = produccion;
     }
 
     public double getPorcentajeMuertes() {
         return porcentajeMuertes;
     }
     
+    
+    public static boolean verificarNombresIguales(ArrayList<Planeta> planetas,FramePrincipal fp){
+        boolean aux=false;
+        for (int i = 0; i < planetas.size()-1; i++) {
+            for (int j = i+1; j < planetas.size(); j++) {
+                if (planetas.get(i).getNombre().equals(planetas.get(j).getNombre())) {
+                    fp.agregarTextoAcciones("Planetas con el mismo Nombre: \""+planetas.get(i).nombre+"\"");
+                    aux=true;
+                }
+            }
+        }
+        
+        return aux;
+    }
     
 }

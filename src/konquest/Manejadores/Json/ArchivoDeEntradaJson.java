@@ -10,16 +10,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import konquest.Manejadores.Juego.ControladorJuego;
 import konquest.Manejadores.Tablero.DibujadorDeTablero;
 import konquest.Manejadores.Tablero.ManejadorDeCasillas;
 import konquest.cup.Json.AnalizadorSintacticoJson;
 import konquest.ui.FramePrincipal;
 import konquest.jflex.Json.AnalizadorLexicoJson;
-import konquest.mapa.Casilla;
 import konquest.mapa.Mapa;
 
 /**
@@ -32,19 +31,26 @@ public class ArchivoDeEntradaJson {
         if (file.getPath().endsWith(".Json")) {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
-
+                frame.agregarTextoAcciones("====Empezando Analisis==================================\n");
                 AnalizadorLexicoJson alj = new AnalizadorLexicoJson(br);
                 AnalizadorSintacticoJson asj = new AnalizadorSintacticoJson(alj);
+                asj.setFrame(frame);
                 asj.parse();
                 if (asj.error) {
-
+                    frame.agregarTextoAcciones("Arregle Los ERRORES Para Poder Abrir El Mapa\n");
                 } else {
-                    Mapa mapa = new Mapa();
-                    ManejadorDeCasillas mc = new ManejadorDeCasillas();
-                    mapa.setCasillas(mc.generarCasillas(8, 5));
-                    DibujadorDeTablero ddt = new DibujadorDeTablero();
-                    ddt.dibujarTablero(mapa, frame.getJPanel());
+                    if (asj.errorRecuperable) {
+                        frame.agregarTextoAcciones("Mapa Cargada con ERRORES\n");
+                    }else{
+                        frame.agregarTextoAcciones("Mapa Cargada con Exito\n");
+                    }
+                    Mapa mapa = asj.getMapa();
+                    
+                    ControladorJuego idj=new ControladorJuego();
+                    idj.iniciarJuego(mapa, frame);
+                    
                 }
+                frame.agregarTextoAcciones("=====================================================");
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {

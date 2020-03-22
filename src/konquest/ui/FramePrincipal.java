@@ -11,7 +11,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import konquest.Manejadores.Json.ArchivoDeEntradaJson;
-import konquest.mapa.Casilla;
+import konquest.Manejadores.Juego.Objetos.Ronda;
+import konquest.mapa.Jugador;
 
 /**
  *
@@ -40,25 +41,130 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         panel = new javax.swing.JPanel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        txtAcciones = new javax.swing.JTextArea();
+        barTurnos = new javax.swing.JToolBar();
+        lblTurno = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        lblInstruccion = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jButton2 = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
+        jPasswordField1 = new javax.swing.JPasswordField();
+        jButton1 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        lblRonda = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        jMenuItem2 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jScrollPane1.setBackground(new java.awt.Color(31, 30, 28));
+
+        panel.setBackground(new java.awt.Color(15, 16, 49));
 
         javax.swing.GroupLayout panelLayout = new javax.swing.GroupLayout(panel);
         panel.setLayout(panelLayout);
         panelLayout.setHorizontalGroup(
             panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 582, Short.MAX_VALUE)
+            .addGap(0, 939, Short.MAX_VALUE)
         );
         panelLayout.setVerticalGroup(
             panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 283, Short.MAX_VALUE)
+            .addGap(0, 301, Short.MAX_VALUE)
         );
 
         jScrollPane1.setViewportView(panel);
+
+        txtAcciones.setBackground(new java.awt.Color(115, 99, 227));
+        txtAcciones.setColumns(20);
+        txtAcciones.setForeground(new java.awt.Color(254, 254, 254));
+        txtAcciones.setRows(5);
+        jScrollPane2.setViewportView(txtAcciones);
+
+        jScrollPane3.setViewportView(jScrollPane2);
+
+        barTurnos.setBackground(new java.awt.Color(254, 254, 254));
+        barTurnos.setFloatable(false);
+        barTurnos.setOpaque(false);
+
+        lblTurno.setForeground(new java.awt.Color(254, 254, 254));
+        lblTurno.setText("Bienvenido");
+        barTurnos.add(lblTurno);
+
+        jLabel1.setText("                       ");
+        barTurnos.add(jLabel1);
+
+        lblInstruccion.setText("                                  ");
+        barTurnos.add(lblInstruccion);
+
+        jLabel4.setText("                       ");
+        barTurnos.add(jLabel4);
+
+        jButton2.setText("Calcular Distancia");
+        jButton2.setEnabled(false);
+        jButton2.setFocusable(false);
+        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+        barTurnos.add(jButton2);
+
+        jButton3.setText("Estadisticas");
+        jButton3.setEnabled(false);
+        jButton3.setFocusable(false);
+        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
+        barTurnos.add(jButton3);
+
+        jButton4.setText("Flotas");
+        jButton4.setEnabled(false);
+        jButton4.setFocusable(false);
+        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        barTurnos.add(jButton4);
+
+        jLabel2.setText("                                    ");
+        jLabel2.setMaximumSize(new java.awt.Dimension(1000, 17));
+        barTurnos.add(jLabel2);
+
+        jPasswordField1.setToolTipText("");
+        jPasswordField1.setEnabled(false);
+        jPasswordField1.setMaximumSize(new java.awt.Dimension(50, 2147483647));
+        jPasswordField1.setMinimumSize(new java.awt.Dimension(50, 27));
+        jPasswordField1.setPreferredSize(new java.awt.Dimension(50, 27));
+        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jPasswordField1ActionPerformed(evt);
+            }
+        });
+        barTurnos.add(jPasswordField1);
+
+        jButton1.setText("Ingresar");
+        jButton1.setEnabled(false);
+        jButton1.setFocusable(false);
+        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        barTurnos.add(jButton1);
+
+        jLabel3.setText("                    ");
+        barTurnos.add(jLabel3);
+
+        lblRonda.setText("Ronda: 0");
 
         jMenu1.setText("Game");
 
@@ -69,6 +175,9 @@ public class FramePrincipal extends javax.swing.JFrame {
             }
         });
         jMenu1.add(jMenuItem1);
+
+        jMenuItem2.setText("Online");
+        jMenu1.add(jMenuItem2);
 
         jMenuBar1.add(jMenu1);
 
@@ -81,17 +190,27 @@ public class FramePrincipal extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(barTurnos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 584, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lblRonda, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addComponent(barTurnos, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblRonda))
         );
 
         pack();
@@ -108,6 +227,18 @@ public class FramePrincipal extends javax.swing.JFrame {
             
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jPasswordField1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton3ActionPerformed
 public JPanel getJPanel(){
     return panel;
 }
@@ -121,17 +252,51 @@ private void agregarFondo() {
         fondo.setVisible(true);
 
     }
+public  void agregarTextoAcciones(String texto){
+    txtAcciones.append(texto);
+}
+
+public  void removerTextoAcciones(){
+    txtAcciones.removeAll();
+}
+
+public void obtenerInfoDeTurno(Jugador jugador,Ronda ronda){
+    lblTurno.setText("Turno: "+jugador.getNombre());
+    lblRonda.setText("Ronda: "+ronda.getNumero());
+    pedirPrimerPlaneta();
+}
+
+public void pedirPrimerPlaneta(){
+    lblInstruccion.setText("\tElije Su Planeta Origen");
+}
 
     /**
      * @param args the command line arguments
      */
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JToolBar barTurnos;
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JLabel lblInstruccion;
+    private javax.swing.JLabel lblRonda;
+    private javax.swing.JLabel lblTurno;
     private javax.swing.JPanel panel;
+    private javax.swing.JTextArea txtAcciones;
     // End of variables declaration//GEN-END:variables
 }

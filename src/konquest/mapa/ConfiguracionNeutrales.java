@@ -15,6 +15,11 @@ public class ConfiguracionNeutrales {
     private boolean mostrarEstadisticas;
     private int produccion;
 
+    public ConfiguracionNeutrales(Object[] atributos){
+    mostrarNaves=(Boolean)atributos[0];
+    mostrarEstadisticas=(Boolean)atributos[1];
+    produccion=(Integer)atributos[2];
+    }
     public boolean isMostrarNaves() {
         return mostrarNaves;
     }
@@ -39,6 +44,13 @@ public class ConfiguracionNeutrales {
         this.produccion = produccion;
     }
     
-    
+        public static boolean verificarObligatorios(Object[] atributos){
+        for (int i = 0; i < 3; i++) {
+            if (atributos[i]==null||atributos[i]=="") {
+                return false;
+            }
+        }
+        return true;
+    }
     
 }

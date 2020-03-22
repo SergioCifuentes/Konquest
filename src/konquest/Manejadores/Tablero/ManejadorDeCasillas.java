@@ -5,25 +5,52 @@
  */
 package konquest.Manejadores.Tablero;
 
+import java.awt.Dimension;
+import java.util.ArrayList;
 import konquest.mapa.Casilla;
+import konquest.mapa.Mapa;
+import konquest.mapa.Planeta;
 
 /**
  *
  * @author sergio
  */
 public class ManejadorDeCasillas {
-    public Casilla[][] generarCasillas(int columnas,int filas){
-      Casilla[][] casillas = new Casilla[columnas][filas];
+
+    public Casilla[][] generarCasillas(int columnas, int filas) {
+        Casilla[][] casillas = new Casilla[columnas][filas];
         for (int i = 0; i < columnas; i++) {
             for (int j = 0; j < filas; j++) {
-                 casillas[i][j]=new Casilla();
-                    casillas[i][j].setBounds(i*Casilla.ANCHO,j*Casilla.ALTO,Casilla.ANCHO,Casilla.ALTO);
-                    casillas[i][j].setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-                    casillas[i][j].setText(i+" "+j);
+                casillas[i][j] = new Casilla();
+                casillas[i][j].setBounds(i * Casilla.ANCHO, j * Casilla.ALTO, Casilla.ANCHO, Casilla.ALTO);
+                casillas[i][j].setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
             }
         }
         return casillas;
-          
+
     }
+
+    public void generarPosicionesDePlanetas(Casilla[][] casillas, ArrayList<Planeta> planetas,Mapa mapa) {
+        ArrayList<Dimension> dimensiones = new ArrayList<>();
+        System.out.println(planetas.size()+"size");
+        for (int i = 0; i < planetas.size(); i++) {
+            Dimension diAux=new Dimension();
+            boolean repetido = false;
+            do {
+                repetido = false;
+                int columna = (int) (Math.random() * casillas.length );
+                int fila = (int) (Math.random() * casillas[0].length );
+                diAux=new Dimension(columna, fila);
+                for (int j = 0; j < dimensiones.size(); j++) {
+                    if (diAux.height==dimensiones.get(j).height&&diAux.width==dimensiones.get(j).width) {
+                        repetido=true;
+                    }
+                }
+
+            } while (repetido);
+            dimensiones.add(diAux);
+            casillas[diAux.width][diAux.height].setPlaneta(planetas.get(i),mapa);
+        }
+    }
+
 }

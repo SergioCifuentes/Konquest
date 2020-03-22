@@ -5,6 +5,8 @@
  */
 package konquest.mapa;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author sergio
@@ -17,14 +19,21 @@ public class PlanetaNeutral extends Planeta{
     }
     public static boolean verificarObligatorios(Object[] atributos){
         for (int i = 0; i < 4; i++) {
-            if (i!=3&&(atributos[i]==null||atributos[i]=="")) {
+            if (i!=2&&(atributos[i]==null||atributos[i]=="")) {
                 return false;
             }
         }
         return true;
     }
     
-    
+    public static void ingresarProduccion(ArrayList<PlanetaNeutral>planetaNeutrals,int produccionGeneral){
+        for (int i = 0; i < planetaNeutrals.size(); i++) {
+            System.out.println(planetaNeutrals.get(i).getProduccion());
+            if (planetaNeutrals.get(i).getProduccion()==null) {
+                planetaNeutrals.get(i).setProduccion(produccionGeneral);
+            }
+        }
+    }
     
     
 }

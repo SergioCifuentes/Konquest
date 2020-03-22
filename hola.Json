@@ -5,7 +5,7 @@ tamaño: {
 filas:10,
 columnas: 10
 },
-alAzar: false,
+alAzar: true,
 
 planetasNeutrales: 20,
 mapaCiego: false,
@@ -20,7 +20,7 @@ finalizacion: 50
 PLANETAS: [
 {
 nombre: "A",
-naves: "B",
+naves: 10,
 produccion: 10,
 porcentajeMuertes:0.44
 },
