@@ -7,6 +7,8 @@ package konquest.Manejadores.Tablero;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
+import konquest.Manejadores.Juego.ControlDeTurnos;
+import konquest.Manejadores.Juego.EleccionDePlaneta;
 import konquest.mapa.Casilla;
 import konquest.mapa.Mapa;
 import konquest.mapa.Planeta;
@@ -17,13 +19,15 @@ import konquest.mapa.Planeta;
  */
 public class ManejadorDeCasillas {
 
-    public Casilla[][] generarCasillas(int columnas, int filas) {
+    public Casilla[][] generarCasillas(int columnas, int filas,ControlDeTurnos cdr,EleccionDePlaneta edp) {
         Casilla[][] casillas = new Casilla[columnas][filas];
         for (int i = 0; i < columnas; i++) {
             for (int j = 0; j < filas; j++) {
-                casillas[i][j] = new Casilla();
+                casillas[i][j] = new Casilla(cdr,edp);
+                casillas[i][j].setColumna(i);
+                casillas[i][j].setFila(j);
                 casillas[i][j].setBounds(i * Casilla.ANCHO, j * Casilla.ALTO, Casilla.ANCHO, Casilla.ALTO);
-                casillas[i][j].setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+                casillas[i][j].setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(254, 254, 254)));
             }
         }
         return casillas;
@@ -32,7 +36,6 @@ public class ManejadorDeCasillas {
 
     public void generarPosicionesDePlanetas(Casilla[][] casillas, ArrayList<Planeta> planetas,Mapa mapa) {
         ArrayList<Dimension> dimensiones = new ArrayList<>();
-        System.out.println(planetas.size()+"size");
         for (int i = 0; i < planetas.size(); i++) {
             Dimension diAux=new Dimension();
             boolean repetido = false;
@@ -50,6 +53,16 @@ public class ManejadorDeCasillas {
             } while (repetido);
             dimensiones.add(diAux);
             casillas[diAux.width][diAux.height].setPlaneta(planetas.get(i),mapa);
+        }
+    }
+    
+    public void reDibujarCasillas(Casilla[][] casillas){
+        for (int i = 0; i < casillas.length; i++) {
+            for (int j = 0; j < casillas[0].length; j++) {
+                if (casillas[i][j].getPlaneta()!=null) {
+                    casillas[i][j].reDibujar();
+                }
+            }
         }
     }
 

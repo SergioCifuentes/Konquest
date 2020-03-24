@@ -21,8 +21,10 @@ public class ControladorJuego {
     public void iniciarJuego(Mapa mapa, FramePrincipal fp) {
         ManejadorDeCasillas mc = new ManejadorDeCasillas();
         ControladorDeRondas cdr= new ControladorDeRondas();
-        ControlDeTurnos cdt =new ControlDeTurnos(mapa.getJugadores(), cdr, fp);
-        mapa.setCasillas(mc.generarCasillas(mapa.getDimension().width, mapa.getDimension().height));
+        ControlDeTurnos cdt =new ControlDeTurnos(mapa, cdr, fp);
+        fp.setCdt(cdt);
+        EleccionDePlaneta edp =new EleccionDePlaneta(fp, cdt);
+        mapa.setCasillas(mc.generarCasillas(mapa.getDimension().width, mapa.getDimension().height,cdt,edp));
         ControladorDeColores cdc = new ControladorDeColores();
         cdc.generarColores(mapa.getJugadores());
         iniciarPosiciones(mapa);

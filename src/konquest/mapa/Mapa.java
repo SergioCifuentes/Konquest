@@ -159,6 +159,17 @@ public class Mapa {
         return aux;
     }
 
+    public ArrayList<Planeta> getTodosLosPlanetas(){
+        ArrayList<Planeta> todos = new ArrayList<>();
+        for (int i = 0; i < planetas.size(); i++) {
+            todos.add(planetas.get(i));
+        }
+        for (int i = 0; i < planetasNeutrales.size(); i++) {
+            todos.add(planetasNeutrales.get(i));
+        }
+        return todos;
+    }
+    
     public static boolean comprobarComponetesDeConstruicion(ArrayList<Object> componentes, FramePrincipal fp) {
         Mapa mapa = null;
         ArrayList<Planeta> plane = null;

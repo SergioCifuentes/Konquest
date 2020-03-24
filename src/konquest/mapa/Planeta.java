@@ -14,10 +14,12 @@ import konquest.ui.FramePrincipal;
  */
 public class Planeta {
     private String nombre;
-    private int naves;
-    private Integer produccion;
+    protected  int naves;
+    protected  Integer produccion;
     private double porcentajeMuertes;
-    private Jugador owner;
+    protected  Jugador owner;
+    protected int produccionOriginal;
+    protected boolean neutral;
     
     public static boolean verificarObligatorios(Object[] atributos){
         for (int i = 0; i < 4; i++) {
@@ -32,7 +34,13 @@ public class Planeta {
         this.nombre = aux;
         this.naves = (Integer)atributos[1];
         this.produccion = (Integer)atributos[2];
+        this.produccionOriginal=produccion;
         this.porcentajeMuertes = (Double)atributos[3];
+        neutral=false;
+    }
+
+    public boolean isNeutral() {
+        return neutral;
     }
 
     public Jugador getOwner() {
@@ -43,11 +51,24 @@ public class Planeta {
         this.owner = owner;
     }
      
+    public void restarNaves(int naves){
+        this.naves-=naves;
+    }
+    public void recibirNavesAleadas(int naves){
+        this.naves+=naves;
+    }
     
     public String getNombre() {
         return nombre;
     }
 
+    public void setNaves(int naves) {
+        this.naves = naves;
+    }
+    public void aumentarProduccion(){
+        produccion++;
+    }
+    
     public int getNaves() {
         return naves;
     }
@@ -63,7 +84,12 @@ public class Planeta {
     public double getPorcentajeMuertes() {
         return porcentajeMuertes;
     }
-    
+    public void serConquistado(Jugador jugadorNuevo,int navesRestantes){
+        produccion=produccionOriginal;
+        
+        this.owner=jugadorNuevo;
+        this.naves=navesRestantes;
+    }
     
     public static boolean verificarNombresIguales(ArrayList<Planeta> planetas,FramePrincipal fp){
         boolean aux=false;

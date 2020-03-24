@@ -16,6 +16,7 @@ public class PlanetaNeutral extends Planeta{
     public PlanetaNeutral(Object[] atributos) {
         super(atributos);
         setOwner(null);
+        neutral=true;
     }
     public static boolean verificarObligatorios(Object[] atributos){
         for (int i = 0; i < 4; i++) {
@@ -28,12 +29,18 @@ public class PlanetaNeutral extends Planeta{
     
     public static void ingresarProduccion(ArrayList<PlanetaNeutral>planetaNeutrals,int produccionGeneral){
         for (int i = 0; i < planetaNeutrals.size(); i++) {
-            System.out.println(planetaNeutrals.get(i).getProduccion());
             if (planetaNeutrals.get(i).getProduccion()==null) {
                 planetaNeutrals.get(i).setProduccion(produccionGeneral);
             }
         }
     }
     
+    @Override
+    public void serConquistado(Jugador jugadorNuevo,int navesRestantes){
+        produccion=produccionOriginal;
+        neutral=false;
+        this.owner=jugadorNuevo;
+        this.naves=navesRestantes;
+    }
     
 }

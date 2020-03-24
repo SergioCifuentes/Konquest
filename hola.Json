@@ -9,9 +9,9 @@ alAzar: true,
 
 planetasNeutrales: 20,
 mapaCiego: false,
-acumular: false ,
+acumular: true ,
 NEUTRALES: {
-mostrarNaves:true,
+mostrarNaves:false,
 mostrarEstadisticas :true,
 produccion: 12
 },
@@ -52,7 +52,7 @@ porcentajeMuertes: 0.998501
 },
 {
 nombre: "F",
-naves: 20,
+naves: 1,
 produccion: 25,
 porcentajeMuertes: 0.21502
 }

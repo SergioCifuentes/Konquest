@@ -20,6 +20,15 @@ public class Jugador {
     private ArrayList<String> nombresPlaneta;
     private int tipo;
     private Color color;
+    private boolean vivo;
+
+    public boolean isVivo() {
+        return vivo;
+    }
+
+    public void setVivo(boolean vivo) {
+        this.vivo = vivo;
+    }
     /*1 HUMANO
     2 DIFICIL
     3 FACIL    
@@ -91,6 +100,7 @@ public class Jugador {
                 for (int k = 0; k < planetas.size(); k++) {
                     if (planetas.get(k).getNombre().equals(jugadores.get(i).getNombresPlaneta().get(j))) {
                         jugadores.get(i).agregarPlaneta(planetas.get(k));
+                        
                         planetas.get(k).setOwner(jugadores.get(i));
                         encontrado = true;
                         break;
@@ -101,6 +111,7 @@ public class Jugador {
                             + ", Planeta:" + jugadores.get(i).getNombresPlaneta().get(j) + "\n");
                     aux=true;
                 }
+                jugadores.get(i).setVivo(true);
             }
         }
         for (int i = 0; i < jugadores.size(); i++) {

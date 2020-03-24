@@ -9,9 +9,12 @@ import java.io.File;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import konquest.Manejadores.Json.ArchivoDeEntradaJson;
+import konquest.Manejadores.Juego.ControlDeTurnos;
 import konquest.Manejadores.Juego.Objetos.Ronda;
+import konquest.mapa.Casilla;
 import konquest.mapa.Jugador;
 
 /**
@@ -19,8 +22,16 @@ import konquest.mapa.Jugador;
  * @author sergio
  */
 public class FramePrincipal extends javax.swing.JFrame {
+
     public final static ImageIcon FONDO = new ImageIcon("src/konquest/imagenes/Fondo.jpg");
     private File file;
+    private Casilla primerCasilla;
+    private Casilla segundaCasilla;
+    private boolean calcularDistancia;
+    private int naves;
+    private final static String TEXTO_TERMINAR_TURNO = "Fin Turno";
+    private final static String TEXTO_ENVIAR = "Enviar";
+    private ControlDeTurnos cdt;
 
     /**
      * Creates new form FramePrincipal
@@ -28,6 +39,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     public FramePrincipal() {
         initComponents();
         agregarFondo();
+        btnCancel.setVisible(false);
     }
 
     /**
@@ -49,15 +61,19 @@ public class FramePrincipal extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         lblInstruccion = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btnCalcularDistancia = new javax.swing.JButton();
+        jLabel5 = new javax.swing.JLabel();
+        btnEstadisticas = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        btnFlotas = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jButton1 = new javax.swing.JButton();
+        numeroTopas = new javax.swing.JPasswordField();
+        jLabel7 = new javax.swing.JLabel();
+        btnEnvio = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
+        btnCancel = new javax.swing.JButton();
         lblRonda = new javax.swing.JLabel();
-        jMenuBar1 = new javax.swing.JMenuBar();
+        menu = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -73,7 +89,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         panel.setLayout(panelLayout);
         panelLayout.setHorizontalGroup(
             panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 939, Short.MAX_VALUE)
+            .addGap(0, 980, Short.MAX_VALUE)
         );
         panelLayout.setVerticalGroup(
             panelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -94,75 +110,128 @@ public class FramePrincipal extends javax.swing.JFrame {
         barTurnos.setFloatable(false);
         barTurnos.setOpaque(false);
 
+        lblTurno.setFont(new java.awt.Font("URW Gothic L", 1, 15)); // NOI18N
         lblTurno.setForeground(new java.awt.Color(254, 254, 254));
         lblTurno.setText("Bienvenido");
         barTurnos.add(lblTurno);
 
-        jLabel1.setText("                       ");
+        jLabel1.setFont(new java.awt.Font("URW Gothic L", 0, 15)); // NOI18N
+        jLabel1.setForeground(java.awt.Color.blue);
+        jLabel1.setText("                ");
         barTurnos.add(jLabel1);
 
+        lblInstruccion.setForeground(new java.awt.Color(119, 119, 119));
         lblInstruccion.setText("                                  ");
         barTurnos.add(lblInstruccion);
 
         jLabel4.setText("                       ");
         barTurnos.add(jLabel4);
 
-        jButton2.setText("Calcular Distancia");
-        jButton2.setEnabled(false);
-        jButton2.setFocusable(false);
-        jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnCalcularDistancia.setBackground(new java.awt.Color(15, 16, 49));
+        btnCalcularDistancia.setFont(new java.awt.Font("URW Gothic L", 0, 15)); // NOI18N
+        btnCalcularDistancia.setForeground(new java.awt.Color(254, 254, 254));
+        btnCalcularDistancia.setText("Calcular Distancia");
+        btnCalcularDistancia.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(254, 254, 254), 1, true));
+        btnCalcularDistancia.setEnabled(false);
+        btnCalcularDistancia.setFocusable(false);
+        btnCalcularDistancia.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnCalcularDistancia.setOpaque(true);
+        btnCalcularDistancia.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnCalcularDistancia.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnCalcularDistanciaActionPerformed(evt);
             }
         });
-        barTurnos.add(jButton2);
+        barTurnos.add(btnCalcularDistancia);
 
-        jButton3.setText("Estadisticas");
-        jButton3.setEnabled(false);
-        jButton3.setFocusable(false);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        jLabel5.setText(" ");
+        barTurnos.add(jLabel5);
+
+        btnEstadisticas.setBackground(new java.awt.Color(15, 16, 49));
+        btnEstadisticas.setFont(new java.awt.Font("URW Gothic L", 0, 15)); // NOI18N
+        btnEstadisticas.setForeground(new java.awt.Color(254, 254, 254));
+        btnEstadisticas.setText("Estadisticas");
+        btnEstadisticas.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(254, 254, 254), 1, true));
+        btnEstadisticas.setEnabled(false);
+        btnEstadisticas.setFocusable(false);
+        btnEstadisticas.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnEstadisticas.setOpaque(true);
+        btnEstadisticas.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnEstadisticas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnEstadisticasActionPerformed(evt);
             }
         });
-        barTurnos.add(jButton3);
+        barTurnos.add(btnEstadisticas);
 
-        jButton4.setText("Flotas");
-        jButton4.setEnabled(false);
-        jButton4.setFocusable(false);
-        jButton4.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton4.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        barTurnos.add(jButton4);
+        jLabel6.setText(" ");
+        barTurnos.add(jLabel6);
+
+        btnFlotas.setBackground(new java.awt.Color(15, 16, 49));
+        btnFlotas.setFont(new java.awt.Font("URW Gothic L", 0, 15)); // NOI18N
+        btnFlotas.setForeground(new java.awt.Color(254, 254, 254));
+        btnFlotas.setText("Flotas");
+        btnFlotas.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(254, 254, 254), 1, true));
+        btnFlotas.setEnabled(false);
+        btnFlotas.setFocusable(false);
+        btnFlotas.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnFlotas.setOpaque(true);
+        btnFlotas.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnFlotas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFlotasActionPerformed(evt);
+            }
+        });
+        barTurnos.add(btnFlotas);
 
         jLabel2.setText("                                    ");
         jLabel2.setMaximumSize(new java.awt.Dimension(1000, 17));
         barTurnos.add(jLabel2);
 
-        jPasswordField1.setToolTipText("");
-        jPasswordField1.setEnabled(false);
-        jPasswordField1.setMaximumSize(new java.awt.Dimension(50, 2147483647));
-        jPasswordField1.setMinimumSize(new java.awt.Dimension(50, 27));
-        jPasswordField1.setPreferredSize(new java.awt.Dimension(50, 27));
-        jPasswordField1.addActionListener(new java.awt.event.ActionListener() {
+        numeroTopas.setToolTipText("");
+        numeroTopas.setEnabled(false);
+        numeroTopas.setMaximumSize(new java.awt.Dimension(50, 2147483647));
+        numeroTopas.setMinimumSize(new java.awt.Dimension(50, 27));
+        numeroTopas.setPreferredSize(new java.awt.Dimension(50, 27));
+        numeroTopas.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField1ActionPerformed(evt);
+                numeroTopasActionPerformed(evt);
             }
         });
-        barTurnos.add(jPasswordField1);
+        barTurnos.add(numeroTopas);
 
-        jButton1.setText("Ingresar");
-        jButton1.setEnabled(false);
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        barTurnos.add(jButton1);
+        jLabel7.setText(" ");
+        barTurnos.add(jLabel7);
 
-        jLabel3.setText("                    ");
+        btnEnvio.setText("Enviar");
+        btnEnvio.setEnabled(false);
+        btnEnvio.setFocusable(false);
+        btnEnvio.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnEnvio.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnEnvio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEnvioActionPerformed(evt);
+            }
+        });
+        barTurnos.add(btnEnvio);
+
+        jLabel3.setText("            ");
         barTurnos.add(jLabel3);
+
+        btnCancel.setBackground(java.awt.Color.red);
+        btnCancel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        btnCancel.setForeground(new java.awt.Color(254, 254, 254));
+        btnCancel.setText("Cancelar");
+        btnCancel.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        btnCancel.setFocusable(false);
+        btnCancel.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnCancel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
+        barTurnos.add(btnCancel);
 
         lblRonda.setText("Ronda: 0");
 
@@ -179,18 +248,18 @@ public class FramePrincipal extends javax.swing.JFrame {
         jMenuItem2.setText("Online");
         jMenu1.add(jMenuItem2);
 
-        jMenuBar1.add(jMenu1);
+        menu.add(jMenu1);
 
         jMenu2.setText("Edit");
-        jMenuBar1.add(jMenu2);
+        menu.add(jMenu2);
 
-        setJMenuBar(jMenuBar1);
+        setJMenuBar(menu);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(barTurnos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(barTurnos, javax.swing.GroupLayout.DEFAULT_SIZE, 932, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -198,8 +267,7 @@ public class FramePrincipal extends javax.swing.JFrame {
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRonda, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -217,85 +285,202 @@ public class FramePrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+
         JFileChooser jfc = new JFileChooser();
-       jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-       jfc.showOpenDialog(this);
-       file =jfc.getSelectedFile();
-        if (file!=null) {
-            ArchivoDeEntradaJson adej=new ArchivoDeEntradaJson();
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jfc.showOpenDialog(this);
+        file = jfc.getSelectedFile();
+        if (file != null) {
+            txtAcciones.removeAll();
+            ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
             adej.abrirAchivo(file, this);
-            
+
         }
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
-    private void jPasswordField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jPasswordField1ActionPerformed
+    private void numeroTopasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_numeroTopasActionPerformed
+        enviar();
+    }//GEN-LAST:event_numeroTopasActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void btnCalcularDistanciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCalcularDistanciaActionPerformed
+        calcularDistancia = true;
+        ocultarCancel(false);
+    }//GEN-LAST:event_btnCalcularDistanciaActionPerformed
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void btnEstadisticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEstadisticasActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton3ActionPerformed
-public JPanel getJPanel(){
-    return panel;
-}
+    }//GEN-LAST:event_btnEstadisticasActionPerformed
 
-private void agregarFondo() {
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        pedirPrimerPlaneta();
+    }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void btnEnvioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnvioActionPerformed
+        if (btnEnvio.getText().equals(TEXTO_ENVIAR)) {
+           enviar();
+        } else {
+            cdt.finalizarTurno();
+        }
+    }//GEN-LAST:event_btnEnvioActionPerformed
+
+    private void btnFlotasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFlotasActionPerformed
+        FlotasPendientes flota=new FlotasPendientes(this, calcularDistancia,cdt);
+        flota.setVisible(true);
+    }//GEN-LAST:event_btnFlotasActionPerformed
+    private void enviar(){
+         if (numeroTopas.getText() != null) {
+                try {
+                    naves = Integer.parseInt(numeroTopas.getText());
+                    if (naves<=primerCasilla.getPlaneta().getNaves()) {
+                    cdt.terminarEnvio();    
+                    }else{
+                         JOptionPane.showMessageDialog(this, "No Cuentas Con Esa Cantidad De Naves \nEn El Planeta Origen", "Error", JOptionPane.ERROR_MESSAGE);
+                         naves=0;
+                    }
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "Debes Ingresar Un Numero Entero", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Debes Ingresar el Numero De Naves", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+    }
+    
+    public JPanel getJPanel() {
+        return panel;
+    }
+
+    public int getNaves() {
+        return naves;
+    }
+
+    private void ocultarCancel(boolean bo) {
+        btnCancel.setVisible(!bo);
+        if (bo) {
+            btnEnvio.setEnabled(true);
+            btnEnvio.setText(TEXTO_TERMINAR_TURNO);
+        } else {
+            btnEnvio.setEnabled(false);
+            btnEnvio.setText(TEXTO_ENVIAR);
+        }
+    }
+
+    private void agregarFondo() {
         JLabel fondo = new JLabel();
         fondo.setLocation(0, 0);
-        fondo.setBounds(0,0,3840,2400);
+        fondo.setBounds(0, 0, 3840, 2400);
         fondo.setIcon(FONDO);
         this.add(fondo);
         fondo.setVisible(true);
 
     }
-public  void agregarTextoAcciones(String texto){
-    txtAcciones.append(texto);
-}
 
-public  void removerTextoAcciones(){
-    txtAcciones.removeAll();
-}
+    public void agregarTextoAcciones(String texto) {
+        txtAcciones.append(texto);
+    }
 
-public void obtenerInfoDeTurno(Jugador jugador,Ronda ronda){
-    lblTurno.setText("Turno: "+jugador.getNombre());
-    lblRonda.setText("Ronda: "+ronda.getNumero());
-    pedirPrimerPlaneta();
-}
+    public void removerTextoAcciones() {
+        txtAcciones.removeAll();
+    }
 
-public void pedirPrimerPlaneta(){
-    lblInstruccion.setText("\tElije Su Planeta Origen");
-}
+    public void obtenerInfoDeTurno(Jugador jugador, Ronda ronda) {
+
+        lblTurno.setText("Turno: " + jugador.getNombre());
+        lblRonda.setText("Ronda: " + ronda.getNumero());
+
+        pedirPrimerPlaneta();
+    }
+
+    private void resetVariables() {
+        primerCasilla = null;
+        segundaCasilla = null;
+        calcularDistancia = false;
+        ocultarCancel(true);
+        btnEstadisticas.setEnabled(true);
+        btnCalcularDistancia.setEnabled(true);
+        btnFlotas.setEnabled(true);
+        numeroTopas.setText("");
+        numeroTopas.setEnabled(false);
+
+    }
+
+    public void pedirPrimerPlaneta() {
+        resetVariables();
+
+        lblInstruccion.setText("\tElije Su Planeta Origen");
+    }
+
+    public void setCdt(ControlDeTurnos cdt) {
+        this.cdt = cdt;
+    }
+
+    public void setPrimerPlaneta(Casilla prPlaneta) {
+        this.primerCasilla = prPlaneta;
+        pedirSegundoPlaneta();
+    }
+
+    public void pedirSegundoPlaneta() {
+        ocultarCancel(false);
+        btnCalcularDistancia.setEnabled(false);
+        if (calcularDistancia) {
+            lblInstruccion.setText("\t Distancia:" + primerCasilla.getPlaneta().getNombre() + " -> Elije Su Planeta Destino");
+        } else {
+            lblInstruccion.setText("\t" + primerCasilla.getPlaneta().getNombre() + " -> Elije Su Planeta Destino");
+        }
+
+    }
+
+    public void setSegundaCasilla(Casilla segunda) {
+        this.segundaCasilla = segunda;
+        pedirNumeroNaves();
+    }
+
+    private void pedirNumeroNaves() {
+        lblInstruccion.setText(primerCasilla.getPlaneta().getNombre() + "->" + segundaCasilla.getPlaneta().getNombre() + " Ingrese La Cantidad De Naves");
+        numeroTopas.setEnabled(true);
+        btnEnvio.setEnabled(true);
+    }
 
     /**
      * @param args the command line arguments
      */
+    public Casilla getPrimerCasilla() {
+        return primerCasilla;
+    }
+
+    public Casilla getSegundaCasilla() {
+        return segundaCasilla;
+    }
+
+    public boolean isCalcularDistancia() {
+        return calcularDistancia;
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToolBar barTurnos;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton btnCalcularDistancia;
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton btnEnvio;
+    private javax.swing.JButton btnEstadisticas;
+    private javax.swing.JButton btnFlotas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JLabel lblInstruccion;
     private javax.swing.JLabel lblRonda;
     private javax.swing.JLabel lblTurno;
+    private javax.swing.JMenuBar menu;
+    private javax.swing.JPasswordField numeroTopas;
     private javax.swing.JPanel panel;
     private javax.swing.JTextArea txtAcciones;
     // End of variables declaration//GEN-END:variables

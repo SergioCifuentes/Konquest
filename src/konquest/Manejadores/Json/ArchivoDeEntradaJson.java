@@ -14,8 +14,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import konquest.Manejadores.Juego.ControladorJuego;
-import konquest.Manejadores.Tablero.DibujadorDeTablero;
-import konquest.Manejadores.Tablero.ManejadorDeCasillas;
 import konquest.cup.Json.AnalizadorSintacticoJson;
 import konquest.ui.FramePrincipal;
 import konquest.jflex.Json.AnalizadorLexicoJson;

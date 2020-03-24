@@ -6,6 +6,7 @@
 package konquest.Manejadores.Juego;
 
 import java.util.ArrayList;
+import konquest.Manejadores.Juego.Objetos.ControlDeFlotas;
 import konquest.Manejadores.Juego.Objetos.Ronda;
 
 /**
@@ -21,11 +22,15 @@ public class ControladorDeRondas {
         rondaActual=new Ronda(1);
         rondas=new ArrayList<>();
         
-    }
+}
     
-    public void terminarRonda(){
+    public void terminarRonda(ControlDeFlotas cdf,ControlDeTurnos cdt){
+        ManjeadorDeProducciones manjeadorDeProducciones = new ManjeadorDeProducciones();
+        
+        manjeadorDeProducciones.producirNaves(cdt.getMapa().getTodosLosPlanetas(),cdt.getMapa().isAcumular());
         rondas.add(rondaActual);
         rondaActual=new Ronda(rondaActual.getNumero()+1);
+        cdf.realizarEnviosDeRonda(cdt);
     }
 
     public ArrayList<Ronda> getRondas() {

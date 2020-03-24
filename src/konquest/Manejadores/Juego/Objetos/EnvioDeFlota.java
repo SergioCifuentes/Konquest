@@ -5,6 +5,7 @@
  */
 package konquest.Manejadores.Juego.Objetos;
 
+import konquest.mapa.Casilla;
 import konquest.mapa.Jugador;
 import konquest.mapa.Planeta;
 
@@ -13,19 +14,27 @@ import konquest.mapa.Planeta;
  * @author sergio
  */
 public class EnvioDeFlota {
-    private Planeta origen;
-    private Planeta destino;
+    private Casilla origen;
+    private Casilla destino;
     private Jugador ordenador;
     private int naves;
-    private float produccion;
     private Ronda ronda;
     private int turnoDestino;
 
-    public Planeta getOrigen() {
+    public EnvioDeFlota(Casilla origen, Casilla destino, Jugador ordenador, int naves, Ronda ronda, int turnoDestino) {
+        this.origen = origen;
+        this.destino = destino;
+        this.ordenador = ordenador;
+        this.naves = naves;
+        this.ronda = ronda;
+        this.turnoDestino = turnoDestino;
+    }
+
+    public Casilla getOrigen() {
         return origen;
     }
 
-    public Planeta getDestino() {
+    public Casilla getDestino() {
         return destino;
     }
 
@@ -37,9 +46,6 @@ public class EnvioDeFlota {
         return naves;
     }
 
-    public float getProduccion() {
-        return produccion;
-    }
 
    
 
