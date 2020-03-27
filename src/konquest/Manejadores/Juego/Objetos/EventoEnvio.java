@@ -5,6 +5,11 @@
  */
 package konquest.Manejadores.Juego.Objetos;
 
+import java.awt.Color;
+import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import konquest.Manejadores.Tablero.ControladorDeColores;
+import konquest.contrladoresUI.TextoDeAcciones;
 import konquest.mapa.Planeta;
 
 /**
@@ -24,27 +29,65 @@ public class EventoEnvio {
     private Planeta origen;
     private Planeta destino;
     private int naves;
+    private int ronda;
+    public Planeta getOrigen() {
+        return origen;
+    }
 
-    public EventoEnvio(int tipo, Planeta origen, Planeta destino, int naves) {
-        this.tipo = tipo;
+    public Planeta getDestino() {
+        return destino;
+    }
+
+    public int getRonda() {
+        return ronda;
+    }
+
+    public int getTipo() {
+        return tipo;
+    }
+
+
+
     
+    
+    public EventoEnvio(int tipo, Planeta origen, Planeta destino, int naves,int ronda) {
+        this.tipo = tipo;
+    this.ronda=ronda;
         this.origen = origen;
         this.destino = destino;
         this.naves = naves;
     }
     
-    public String getTextConsola(){
+    public void appendTextConsola(JPanel panel,JTextPane textPane){
+        
         switch (tipo) {
             case TIPO_CONQUISTA:
-                return origen.getOwner().getNombre()+" conquisto el Planeta "+destino.getNombre()+"\n";
+                TextoDeAcciones.appendToPane(textPane, origen.getOwner().getNombre(), origen.getOwner().getColor());
+                TextoDeAcciones.appendToPane(textPane, " conquisto el Planeta ", Color.WHITE);
+                TextoDeAcciones.appendToPane(textPane, destino.getNombre()+"\n", destino.getOwner().getColor());
+                break;
             
             case TIPO_RENFUERZOS:
-                return "Renfuerzos llegaron al Planeta "+destino.getNombre()+" desde "+origen.getNombre()+"("+naves+"naves)\n";
+                TextoDeAcciones.appendToPane(textPane, "Renfuerzos llegaron al Planeta ", Color.WHITE);
+                TextoDeAcciones.appendToPane(textPane, destino.getNombre()+"\n", destino.getOwner().getColor());
+                TextoDeAcciones.appendToPane(textPane, " desde ", Color.WHITE);
+                TextoDeAcciones.appendToPane(textPane, origen.getOwner().getNombre(), origen.getOwner().getColor());
+                TextoDeAcciones.appendToPane(textPane, "("+naves+"naves)\n", Color.WHITE);
+                
+                
+                break;
                 
             case TIPO_DEFENSA:
-                return "Planeta "+destino.getNombre()+" se defendio ante el ataque de "+origen.getOwner().getNombre()+"\n";
+                 TextoDeAcciones.appendToPane(textPane, "Planeta ", Color.WHITE);
+                 if (destino.getOwner()==null) {
+                    TextoDeAcciones.appendToPane(textPane, destino.getNombre(), ControladorDeColores.NEUTRALES);
+                }else{
+                    TextoDeAcciones.appendToPane(textPane, destino.getNombre(), destino.getOwner().getColor());
+                 }
                 
+                TextoDeAcciones.appendToPane(textPane, " se defendio ante el ataque de ", Color.WHITE);
+                TextoDeAcciones.appendToPane(textPane, origen.getOwner().getNombre()+"\n", origen.getOwner().getColor());
+                break;
         }
-        return null;
     }
 }

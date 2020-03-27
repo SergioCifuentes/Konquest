@@ -14,6 +14,7 @@ import java.util.ArrayList;
 public class PlanetaNeutral extends Planeta{
     
     public PlanetaNeutral(Object[] atributos) {
+        
         super(atributos);
         setOwner(null);
         neutral=true;

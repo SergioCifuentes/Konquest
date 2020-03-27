@@ -29,7 +29,7 @@ public class Mapa {
     private Integer finalizado;
     
     public Mapa(Object[] atributos) {
-        id = (String) atributos[0];
+        id = ((String)atributos[0]).substring(1,((String)atributos[0]).length()-1);
         dimension = (Dimension) atributos[1];
         if (atributos[2] == null) {
             alAzar = false;
@@ -65,6 +65,10 @@ public class Mapa {
         return planetas;
     }
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public ArrayList<PlanetaNeutral> getPlanetasNeutrales() {
         return planetasNeutrales;
     }
@@ -75,7 +79,13 @@ public class Mapa {
         return id;
 
     }
+    
 
+    public void setAlAzar(boolean alAzar) {
+        this.alAzar = alAzar;
+    }
+
+    
     public void setCasillas(Casilla[][] casillas) {
         this.casillas = casillas;
     }
@@ -87,6 +97,15 @@ public class Mapa {
     public boolean isAlAzar() {
         return alAzar;
     }
+
+    public void setMapaCiego(boolean mapaCiego) {
+        this.mapaCiego = mapaCiego;
+    }
+
+    public void setAcumular(boolean acumular) {
+        this.acumular = acumular;
+    }
+    
 
     public int getNumeroPlanetasNeutrales() {
         return numeroPlanetasNeutrales;

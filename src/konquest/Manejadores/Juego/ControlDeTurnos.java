@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import konquest.Manejadores.Juego.EnemigosPC.ManejadorEnemigoPC;
 import konquest.Manejadores.Juego.Objetos.ControlDeFlotas;
 import konquest.Manejadores.Juego.Objetos.EnvioDeFlota;
+import konquest.Manejadores.Juego.Objetos.EventoEnvio;
 import konquest.Manejadores.Tablero.DibujadorDeTablero;
 import konquest.Manejadores.Tablero.Distancias;
 import konquest.Manejadores.Tablero.ManejadorDeCasillas;
@@ -40,6 +41,12 @@ public class ControlDeTurnos {
     public Mapa getMapa(){
         return mapa;
     }
+
+    public ControlDeFlotas getCdf() {
+        return cdf;
+    }
+    
+    
     
     public ControlDeTurnos(Mapa mapa, ControladorDeRondas cdr, FramePrincipal fp) {
         this.cdr = cdr;
@@ -118,4 +125,9 @@ public class ControlDeTurnos {
         
     }
     
+    
+    
+    public FramePrincipal getFramePrincipal(){
+        return fp;
+    }
 }

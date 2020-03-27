@@ -5,15 +5,24 @@
  */
 package konquest.ui;
 
+import java.awt.Color;
 import java.io.File;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import konquest.Manejadores.Json.ArchivoDeEntradaJson;
 import konquest.Manejadores.Juego.ControlDeTurnos;
+import konquest.Manejadores.Juego.Objetos.EventoEnvio;
 import konquest.Manejadores.Juego.Objetos.Ronda;
+import konquest.contrladoresUI.TextoDeAcciones;
 import konquest.mapa.Casilla;
 import konquest.mapa.Jugador;
 
@@ -32,6 +41,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     private final static String TEXTO_TERMINAR_TURNO = "Fin Turno";
     private final static String TEXTO_ENVIAR = "Enviar";
     private ControlDeTurnos cdt;
+    private JPanel pane;
 
     /**
      * Creates new form FramePrincipal
@@ -40,6 +50,7 @@ public class FramePrincipal extends javax.swing.JFrame {
         initComponents();
         agregarFondo();
         btnCancel.setVisible(false);
+        pane = new JPanel();
     }
 
     /**
@@ -51,11 +62,9 @@ public class FramePrincipal extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jMenu3 = new javax.swing.JMenu();
         jScrollPane1 = new javax.swing.JScrollPane();
         panel = new javax.swing.JPanel();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        txtAcciones = new javax.swing.JTextArea();
         barTurnos = new javax.swing.JToolBar();
         lblTurno = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -73,11 +82,20 @@ public class FramePrincipal extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         btnCancel = new javax.swing.JButton();
         lblRonda = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        paneAcciones = new javax.swing.JTextPane();
         menu = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
+        menuOpen = new javax.swing.JMenu();
+        menuItemOpen = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
+        menuItemOnline = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        memuItemNew = new javax.swing.JMenuItem();
+        menuItemEdit = new javax.swing.JMenuItem();
+
+        jMenu3.setText("jMenu3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -97,14 +115,6 @@ public class FramePrincipal extends javax.swing.JFrame {
         );
 
         jScrollPane1.setViewportView(panel);
-
-        txtAcciones.setBackground(new java.awt.Color(115, 99, 227));
-        txtAcciones.setColumns(20);
-        txtAcciones.setForeground(new java.awt.Color(254, 254, 254));
-        txtAcciones.setRows(5);
-        jScrollPane2.setViewportView(txtAcciones);
-
-        jScrollPane3.setViewportView(jScrollPane2);
 
         barTurnos.setBackground(new java.awt.Color(254, 254, 254));
         barTurnos.setFloatable(false);
@@ -235,22 +245,50 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         lblRonda.setText("Ronda: 0");
 
-        jMenu1.setText("Game");
+        paneAcciones.setBackground(new java.awt.Color(1, 1, 1));
+        jScrollPane4.setViewportView(paneAcciones);
 
-        jMenuItem1.setText("Open");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        jScrollPane3.setViewportView(jScrollPane4);
+
+        menuOpen.setText("Game");
+
+        menuItemOpen.setText("Jugar");
+        menuItemOpen.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                menuItemOpenActionPerformed(evt);
             }
         });
-        jMenu1.add(jMenuItem1);
+        menuOpen.add(menuItemOpen);
 
-        jMenuItem2.setText("Online");
-        jMenu1.add(jMenuItem2);
+        jMenuItem1.setText("Cargar Partida");
+        menuOpen.add(jMenuItem1);
 
-        menu.add(jMenu1);
+        jMenuItem2.setText("Replay");
+        menuOpen.add(jMenuItem2);
 
-        jMenu2.setText("Edit");
+        menuItemOnline.setText("Online");
+        menuOpen.add(menuItemOnline);
+
+        menu.add(menuOpen);
+
+        jMenu2.setText("File");
+
+        memuItemNew.setText("Nueva Mapa");
+        memuItemNew.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                memuItemNewActionPerformed(evt);
+            }
+        });
+        jMenu2.add(memuItemNew);
+
+        menuItemEdit.setText("Editar");
+        menuItemEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemEditActionPerformed(evt);
+            }
+        });
+        jMenu2.add(menuItemEdit);
+
         menu.add(jMenu2);
 
         setJMenuBar(menu);
@@ -259,11 +297,13 @@ public class FramePrincipal extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(barTurnos, javax.swing.GroupLayout.DEFAULT_SIZE, 932, Short.MAX_VALUE)
+            .addComponent(barTurnos, javax.swing.GroupLayout.DEFAULT_SIZE, 959, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane3)
+                        .addContainerGap())
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(lblRonda, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -274,29 +314,30 @@ public class FramePrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(barTurnos, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 280, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(14, 14, 14)
                 .addComponent(lblRonda))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void menuItemOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemOpenActionPerformed
 
         JFileChooser jfc = new JFileChooser();
         jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         jfc.showOpenDialog(this);
         file = jfc.getSelectedFile();
         if (file != null) {
-            txtAcciones.removeAll();
+            removerTextoAcciones();
+            panel.removeAll();
             ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
             adej.abrirAchivo(file, this);
 
         }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_menuItemOpenActionPerformed
 
     private void numeroTopasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_numeroTopasActionPerformed
         enviar();
@@ -317,34 +358,53 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     private void btnEnvioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnvioActionPerformed
         if (btnEnvio.getText().equals(TEXTO_ENVIAR)) {
-           enviar();
+            enviar();
         } else {
             cdt.finalizarTurno();
         }
     }//GEN-LAST:event_btnEnvioActionPerformed
 
     private void btnFlotasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFlotasActionPerformed
-        FlotasPendientes flota=new FlotasPendientes(this, calcularDistancia,cdt);
+        FlotasPendientes flota = new FlotasPendientes(this, calcularDistancia, cdt);
         flota.setVisible(true);
     }//GEN-LAST:event_btnFlotasActionPerformed
-    private void enviar(){
-         if (numeroTopas.getText() != null) {
-                try {
-                    naves = Integer.parseInt(numeroTopas.getText());
-                    if (naves<=primerCasilla.getPlaneta().getNaves()) {
-                    cdt.terminarEnvio();    
-                    }else{
-                         JOptionPane.showMessageDialog(this, "No Cuentas Con Esa Cantidad De Naves \nEn El Planeta Origen", "Error", JOptionPane.ERROR_MESSAGE);
-                         naves=0;
-                    }
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "Debes Ingresar Un Numero Entero", "Error", JOptionPane.ERROR_MESSAGE);
+
+    private void menuItemEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemEditActionPerformed
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jfc.showOpenDialog(this);
+        file = jfc.getSelectedFile();
+        if (file != null) {
+            removerTextoAcciones();
+            panel.removeAll();
+            ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
+            adej.abrirAchivoParaEditar(file, this);
+
+        }
+    }//GEN-LAST:event_menuItemEditActionPerformed
+
+    private void memuItemNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memuItemNewActionPerformed
+        EditadorMapas ed= new EditadorMapas(this, calcularDistancia,this);
+        ed.setVisible(true);
+    }//GEN-LAST:event_memuItemNewActionPerformed
+    private void enviar() {
+        if (numeroTopas.getText() != null) {
+            try {
+                naves = Integer.parseInt(numeroTopas.getText());
+                if (naves <= primerCasilla.getPlaneta().getNaves()) {
+                    cdt.terminarEnvio();
+                } else {
+                    JOptionPane.showMessageDialog(this, "No Cuentas Con Esa Cantidad De Naves \nEn El Planeta Origen", "Error", JOptionPane.ERROR_MESSAGE);
+                    naves = 0;
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Debes Ingresar el Numero De Naves", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "Debes Ingresar Un Numero Entero", "Error", JOptionPane.ERROR_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(this, "Debes Ingresar el Numero De Naves", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
-    
+
     public JPanel getJPanel() {
         return panel;
     }
@@ -375,11 +435,14 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     public void agregarTextoAcciones(String texto) {
-        txtAcciones.append(texto);
+        
+        TextoDeAcciones.appendToPane(paneAcciones, texto, Color.WHITE);
     }
 
+
+
     public void removerTextoAcciones() {
-        txtAcciones.removeAll();
+        paneAcciones.setText("");
     }
 
     public void obtenerInfoDeTurno(Jugador jugador, Ronda ronda) {
@@ -455,6 +518,15 @@ public class FramePrincipal extends javax.swing.JFrame {
         return calcularDistancia;
     }
 
+    public JPanel getJPanelAcciones(){
+        return pane;
+    }
+    
+    public JTextPane getJTextPane(){
+    return paneAcciones;
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToolBar barTurnos;
     private javax.swing.JButton btnCalcularDistancia;
@@ -469,19 +541,24 @@ public class FramePrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JLabel lblInstruccion;
     private javax.swing.JLabel lblRonda;
     private javax.swing.JLabel lblTurno;
+    private javax.swing.JMenuItem memuItemNew;
     private javax.swing.JMenuBar menu;
+    private javax.swing.JMenuItem menuItemEdit;
+    private javax.swing.JMenuItem menuItemOnline;
+    private javax.swing.JMenuItem menuItemOpen;
+    private javax.swing.JMenu menuOpen;
     private javax.swing.JPasswordField numeroTopas;
+    private javax.swing.JTextPane paneAcciones;
     private javax.swing.JPanel panel;
-    private javax.swing.JTextArea txtAcciones;
     // End of variables declaration//GEN-END:variables
 }

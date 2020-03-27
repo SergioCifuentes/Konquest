@@ -40,15 +40,15 @@ porcentajeMuertes: 0.8
 PLANETAS_NEUTRALES: [
 {
 nombre: "D",
-naves: 15,
-produccion: 12,
-porcentajeMuertes: 0.8
+naves: 1,
+
+porcentajeMuertes: 0.18
 },
 {
 nombre: "E",
-naves: 11,
+naves: 2,
 produccion: 9,
-porcentajeMuertes: 0.998501
+porcentajeMuertes: 0.298501
 },
 {
 nombre: "F",

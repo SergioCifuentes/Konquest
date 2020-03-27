@@ -18,7 +18,7 @@ public class Planeta {
     protected  Integer produccion;
     private double porcentajeMuertes;
     protected  Jugador owner;
-    protected int produccionOriginal;
+    protected Integer produccionOriginal;
     protected boolean neutral;
     
     public static boolean verificarObligatorios(Object[] atributos){
@@ -29,12 +29,28 @@ public class Planeta {
         }
         return true;
     }
+    public void setNeutral(boolean b){
+        neutral=b;
+    }
+
+    public void setPorcentajeMuertes(double porcentajeMuertes) {
+        this.porcentajeMuertes = porcentajeMuertes;
+    }
+    
+    
     public Planeta(Object[] atributos) {
         String aux = ((String)atributos[0]).substring(1,((String)atributos[0]).length()-1);
         this.nombre = aux;
         this.naves = (Integer)atributos[1];
-        this.produccion = (Integer)atributos[2];
-        this.produccionOriginal=produccion;
+        if (atributos[2]==null) {
+            this.produccion=null;
+            this.produccionOriginal=null;
+        }else{
+            this.produccion = (Integer)atributos[2];
+            this.produccionOriginal=produccion;
+        }
+        
+        
         this.porcentajeMuertes = (Double)atributos[3];
         neutral=false;
     }
@@ -79,6 +95,7 @@ public class Planeta {
 
     public void setProduccion(Integer produccion) {
         this.produccion = produccion;
+        this.produccionOriginal=produccion;
     }
 
     public double getPorcentajeMuertes() {

@@ -26,7 +26,6 @@ public class ControladorDeRondas {
     
     public void terminarRonda(ControlDeFlotas cdf,ControlDeTurnos cdt){
         ManjeadorDeProducciones manjeadorDeProducciones = new ManjeadorDeProducciones();
-        
         manjeadorDeProducciones.producirNaves(cdt.getMapa().getTodosLosPlanetas(),cdt.getMapa().isAcumular());
         rondas.add(rondaActual);
         rondaActual=new Ronda(rondaActual.getNumero()+1);

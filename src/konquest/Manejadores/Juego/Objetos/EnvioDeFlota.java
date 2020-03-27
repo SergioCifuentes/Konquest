@@ -21,6 +21,12 @@ public class EnvioDeFlota {
     private Ronda ronda;
     private int turnoDestino;
 
+    public Ronda getRonda() {
+        return ronda;
+    }
+
+    
+    
     public EnvioDeFlota(Casilla origen, Casilla destino, Jugador ordenador, int naves, Ronda ronda, int turnoDestino) {
         this.origen = origen;
         this.destino = destino;

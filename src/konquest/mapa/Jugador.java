@@ -41,6 +41,9 @@ public class Jugador {
         return color;
     }
 
+    public void setTipo(int tipo){
+        this.tipo=tipo;
+    }
     public void setColor(Color color) {
         this.color = color;
     }
@@ -48,10 +51,13 @@ public class Jugador {
     public Jugador(Object[] atributos) {
         String aux = ((String) atributos[0]).substring(1, ((String) atributos[0]).length() - 1);
         ArrayList<String> aux2= new ArrayList<>();
-        for (int i = 0; i < ((ArrayList<String>)atributos[1]).size(); i++) {
+        if (atributos[1]!=null) {
+            for (int i = 0; i < ((ArrayList<String>)atributos[1]).size(); i++) {
             String nombreSinComillas=((ArrayList<String>)atributos[1]).get(i).substring(1, ((ArrayList<String>)atributos[1]).get(i).length()-1);
             aux2.add(nombreSinComillas);
         }
+        }
+        
         this.nombre = aux;
         this.nombresPlaneta = aux2;
         this.tipo = (Integer) atributos[2];
@@ -68,6 +74,10 @@ public class Jugador {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public ArrayList<Planeta> getPlanetas() {

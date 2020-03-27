@@ -24,6 +24,7 @@ private ArrayList<EnvioDeFlota> envios;
         super(parent, modal);
         this.cdt=cdt;
         initComponents();
+        pedirEnvios();
     }
 
     /**
@@ -101,9 +102,14 @@ private ArrayList<EnvioDeFlota> envios;
 
 
     private void pedirEnvios(){
+         envios=new ArrayList<>();
+        for (int i = cdt.getCdr().getRondaActual().getNumero(); i >= 1; i--) {
+           envios.addAll(cdt.getCdf().obtenerEnviosPornJugador(cdt.getJugadorEnTurnoActual(),i));
+        }
         
     }
     private void mostrarEnvios(){
+        
         
     }
     
