@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 
 import javax.swing.table.DefaultTableModel;
 import konquest.Manejadores.Tablero.ControladorDeColores;
-import konquest.contrladoresUI.EscritorDeMapas;
+import konquest.Escritores.EscritorDeMapas;
 import konquest.mapa.Jugador;
 import konquest.mapa.Mapa;
 import konquest.mapa.PlanetaNeutral;

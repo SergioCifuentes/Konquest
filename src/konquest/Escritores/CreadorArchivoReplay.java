@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package konquest.Replay;
+package konquest.Escritores;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import konquest.Manejadores.Juego.Objetos.EnvioDeFlota;
 import konquest.Replay.Objetos.PartidaInicial;
-import konquest.contrladoresUI.EscritorDeMapas;
 import konquest.mapa.Planeta;
 
 /**
@@ -24,9 +23,53 @@ import konquest.mapa.Planeta;
  */
 public class CreadorArchivoReplay {
 
-    public void crearArchivo(File file, ArrayList<Planeta> planetas, ArrayList<EnvioDeFlota> envios) {
-        String textoAEscribir = "";
-        textoAEscribir += "{\n\tterminado: true,";
+        public void crearArchivo(File file, ArrayList<Planeta> planetas, ArrayList<EnvioDeFlota> envios) {
+            String textoAEscribir = "";
+            textoAEscribir += "{\n\tterminado: true,";
+            textoAEscribir+=escribirPlanetasIniciales(planetas);
+            textoAEscribir += "\n\tRONDAS: {";
+            int ronda=0;
+            boolean segundo=false;
+            System.out.println("enviosss "+envios.size());
+            for (int i = 0; i < envios.size(); i++) {
+                if (i==0) {
+                    ronda=envios.get(i).getRonda().getNumero();
+                    textoAEscribir += "\n\t\t"+ronda+": [";
+                }
+                if (envios.get(i).getRonda().getNumero()==ronda) {
+                    if (segundo) {
+                        textoAEscribir+=",";
+                    }
+                    textoAEscribir += "\n\t\t\t{";
+                    textoAEscribir += "\n\t\t\torigen: \""+envios.get(i).getOrigen().getPlaneta().getNombre()+"\",";
+                    textoAEscribir += "\n\t\t\tdestino: \""+envios.get(i).getDestino().getPlaneta().getNombre()+"\",";
+                    textoAEscribir += "\n\t\t\tnaves: "+envios.get(i).getNaves();
+                    textoAEscribir += "\n\t\t\t}";
+                    segundo=true;
+                }else{
+                    textoAEscribir += "\n\t\t],";
+                    segundo = false;
+                    ronda=envios.get(i).getRonda().getNumero();
+                    textoAEscribir += "\n\t\t"+ronda+": [";
+                    i--;
+                }
+            }
+            textoAEscribir += "\n\t\t]";
+            textoAEscribir += "\n\t}";
+            textoAEscribir += "\n}";
+
+            try {
+
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+                    bw.write(textoAEscribir);
+                }
+            } catch (IOException ex) {
+                System.out.println("error AL escribir Mapa");
+            }
+    }
+
+    public static String escribirPlanetasIniciales(ArrayList<Planeta> planetas){
+        String textoAEscribir="";
         textoAEscribir += "\n\tPLANETAS: [";
         for (int i = 0; i < planetas.size(); i++) {
             textoAEscribir+="\n\t\t{";
@@ -45,48 +88,11 @@ public class CreadorArchivoReplay {
                 }
         }
         textoAEscribir += "\n\t],";
-        textoAEscribir += "\n\tRONDAS: {";
-        int ronda=0;
-        boolean segundo=false;
-        System.out.println("enviosss "+envios.size());
-        for (int i = 0; i < envios.size(); i++) {
-            if (i==0) {
-                ronda=envios.get(i).getRonda().getNumero();
-                textoAEscribir += "\n\t\t"+ronda+": [";
-            }
-            if (envios.get(i).getRonda().getNumero()==ronda) {
-                if (segundo) {
-                    textoAEscribir+=",";
-                }
-                textoAEscribir += "\n\t\t\t{";
-                textoAEscribir += "\n\t\t\torigen: \""+envios.get(i).getOrigen().getPlaneta().getNombre()+"\",";
-                textoAEscribir += "\n\t\t\tdestino: \""+envios.get(i).getDestino().getPlaneta().getNombre()+"\",";
-                textoAEscribir += "\n\t\t\tnaves: "+envios.get(i).getNaves();
-                textoAEscribir += "\n\t\t\t}";
-                segundo=true;
-            }else{
-                textoAEscribir += "\n\t\t],";
-                segundo = false;
-                ronda=envios.get(i).getRonda().getNumero();
-                textoAEscribir += "\n\t\t"+ronda+": [";
-                i--;
-            }
-        }
-        textoAEscribir += "\n\t\t]";
-        textoAEscribir += "\n\t}";
-        textoAEscribir += "\n}";
-        
-        try {
-            
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-                bw.write(textoAEscribir);
-            }
-        } catch (IOException ex) {
-            System.out.println("error AL escribir Mapa");
-        }
+        return textoAEscribir;
     }
-
-    public File crearFile(File file, String nombre) {
+    
+    
+    public static File crearFile(File file, String nombre) {
         File fi = new File(file.getPath() + "/" + nombre + ".Json");
         try {
             if (fi.exists()) {
@@ -101,7 +107,7 @@ public class CreadorArchivoReplay {
         return fi;
     }
     
-        public File eliminarTextoDeFile(File file) {
+        public static File eliminarTextoDeFile(File file) {
         try {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
                 bw.write("");

@@ -74,10 +74,8 @@ public class VerificacionFinalizado {
     public void verificarJugadoresVivos(ArrayList<Jugador> jugadores,ArrayList<EnvioDeFlota> enviosPendientes){
         for (int i = 0; i < jugadores.size(); i++) {
             if (jugadores.get(i).isVivo()) {
-                System.out.println(jugadores.get(i).getNombre()+" nom");
-                System.out.println(EstadisticasJugador.verificarNavesExistentes(jugadores.get(i), enviosPendientes));
+
                 if (EstadisticasJugador.verificarNavesExistentes(jugadores.get(i), enviosPendientes)==0) {
-                    System.out.println("muerto");
                     jugadores.get(i).setVivo(false);
                 }
                 System.out.println("");

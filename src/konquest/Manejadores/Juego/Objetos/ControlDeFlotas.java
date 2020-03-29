@@ -86,10 +86,29 @@ public class ControlDeFlotas {
         for (int j = 0; j < in; j++) {
             enviosEnProceso.remove(0);
         }
-
+        agregarNuevosDuenos();
         cdt.redibujarTablero();
         cdt.redibujarTablero();
     }
+    public void restarEnvios(ControlDeTurnos cdt){
+        for (int i = 0; i < enviosEnProceso.size(); i++) {
+            if (enviosEnProceso.get(i).getRonda().getNumero()== cdt.getCdr().getRondaActual().getNumero()-1) {
+                
+                enviosEnProceso.get(i).getOrigen().getPlaneta().restarNaves(enviosEnProceso.get(i).getNaves());
+            }
+        }
+    }
+    
+        public void agregarNuevosDuenos(){
+        for (int i = 0; i < enviosEnProceso.size(); i++) {
+            if (enviosEnProceso.get(i).getOrdenador()==null) {
+                if (enviosEnProceso.get(i).getOrigen().getPlaneta().getOwner()!=null) {
+                    enviosEnProceso.get(i).setOrdenador(enviosEnProceso.get(i).getOrigen().getPlaneta().getOwner());
+                }
+            }
+        }
+    }
+    
 
     public ArrayList<EnvioDeFlota> obtenerEnviosPorJugador(Jugador jugador, int ronda) {
         ordenarEnvios();
@@ -141,7 +160,7 @@ public class ControlDeFlotas {
         if (envio.getDestino().getPlaneta().getOwner() != null) {
             if (envio.getDestino().getPlaneta().getOwner() == envio.getOrdenador()) {
                 envio.getDestino().getPlaneta().recibirNavesAleadas(envio.getNaves());
-                return new EventoEnvio(EventoEnvio.TIPO_RENFUERZOS, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino());
+                return new EventoEnvio(EventoEnvio.TIPO_RENFUERZOS, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino(),envio.getOrdenador());
 
             }
         }
@@ -162,7 +181,7 @@ public class ControlDeFlotas {
                 navesRestantes++;
             }
             envio.getDestino().getPlaneta().serConquistado(envio.getOrdenador(), navesRestantes.intValue());
-            return new EventoEnvio(EventoEnvio.TIPO_CONQUISTA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino());
+            return new EventoEnvio(EventoEnvio.TIPO_CONQUISTA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino(),envio.getOrdenador());
         } else {
             Double navesRestantes = (defensaDestino - ataqueOrigen) / envio.getDestino().getPlaneta().getPorcentajeMuertes();
             if (navesRestantes.intValue()==0) {
@@ -170,7 +189,7 @@ public class ControlDeFlotas {
             }
             envio.getDestino().getPlaneta().setNaves(navesRestantes.intValue());
 
-            return new EventoEnvio(EventoEnvio.TIPO_DEFENSA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino());
+            return new EventoEnvio(EventoEnvio.TIPO_DEFENSA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino(),envio.getOrdenador());
         }
 
     }

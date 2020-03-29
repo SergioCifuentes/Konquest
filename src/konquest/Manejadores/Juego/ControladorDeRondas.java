@@ -42,6 +42,8 @@ public class ControladorDeRondas {
            
         }
     }
+    
+
 
     public ArrayList<Ronda> getRondas() {
         return rondas;

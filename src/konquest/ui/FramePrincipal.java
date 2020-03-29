@@ -7,14 +7,18 @@ package konquest.ui;
 
 import java.awt.Color;
 import java.io.File;
+import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import konquest.Escritores.CreadorArchivoReplay;
+import konquest.Escritores.Guardador;
 import konquest.Manejadores.Json.ArchivoDeEntradaJson;
 import konquest.Manejadores.Juego.ControlDeTurnos;
+import konquest.Manejadores.Juego.Objetos.EnvioDeFlota;
 import konquest.Manejadores.Juego.Objetos.Ronda;
 import konquest.Replay.ManejadorDeEntrada;
 import konquest.Replay.RondasReplay;
@@ -66,6 +70,9 @@ public class FramePrincipal extends javax.swing.JFrame {
     private void initComponents() {
 
         jMenu3 = new javax.swing.JMenu();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenu4 = new javax.swing.JMenu();
         jScrollPane1 = new javax.swing.JScrollPane();
         panel = new javax.swing.JPanel();
         barTurnos = new javax.swing.JToolBar();
@@ -99,8 +106,16 @@ public class FramePrincipal extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         memuItemNew = new javax.swing.JMenuItem();
         menuItemEdit = new javax.swing.JMenuItem();
+        jMenu5 = new javax.swing.JMenu();
+        itemGuardar = new javax.swing.JMenuItem();
 
         jMenu3.setText("jMenu3");
+
+        jMenu1.setText("File");
+        jMenuBar1.add(jMenu1);
+
+        jMenu4.setText("Edit");
+        jMenuBar1.add(jMenu4);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -326,6 +341,18 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         menu.add(jMenu2);
 
+        jMenu5.setText("Partida");
+
+        itemGuardar.setText("Guardar");
+        itemGuardar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemGuardarActionPerformed(evt);
+            }
+        });
+        jMenu5.add(itemGuardar);
+
+        menu.add(jMenu5);
+
         setJMenuBar(menu);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -497,6 +524,32 @@ public class FramePrincipal extends javax.swing.JFrame {
         rr.returnRonda();
         btnSiguiente.setEnabled(true);
     }//GEN-LAST:event_btnRegresarActionPerformed
+
+    private void itemGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemGuardarActionPerformed
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        jfc.showOpenDialog(this);
+        File file = jfc.getSelectedFile();
+        if (file != null) {
+            IngresoDeNombre i = new IngresoDeNombre(this, true);
+            i.setVisible(true);
+            if (i.getNombre() != null) {
+                ArrayList<EnvioDeFlota> envios= new ArrayList<>();
+                for (int j = 0; j < cdt.getCdf().getEnviosEnProceso().size(); j++) {
+                    envios.add(cdt.getCdf().getEnviosEnProceso().get(j));
+                }
+                for (int j = 0; j < cdt.getCdf().getEnviosRealizados().size(); j++) {
+                    envios.add(cdt.getCdf().getEnviosRealizados().get(j));
+                }
+                Guardador guardador= new Guardador();
+                guardador.crearArchivo(CreadorArchivoReplay.crearFile(file,i.getNombre()), cdt.getMapa().getTodosLosPlanetas(), RondasReplay.ordenarEnviosRealizados(envios, false),cdt.getCdr().getRondaActual().getNumero()-1);
+                JOptionPane.showMessageDialog(this, "Partida Guardada");
+                panel.removeAll();
+                panel.repaint();
+            }
+
+        }
+    }//GEN-LAST:event_itemGuardarActionPerformed
     private void enviar() {
         if (numeroTopas.getText() != null) {
             try {
@@ -545,6 +598,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     public boolean isGanador() {
+        itemGuardar.setEnabled(false);
         return ganador;
     }
 
@@ -558,6 +612,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     public void obtenerInfoDeTurno(Jugador jugador, Ronda ronda) {
+        itemGuardar.setEnabled(true);
         ganador=false;
         lblTurno.setText("Turno: " + jugador.getNombre());
         lblRonda.setText("Ronda: " + ronda.getNumero());
@@ -566,6 +621,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     private void resetVariables() {
+        
         primerCasilla = null;
         segundaCasilla = null;
         calcularDistancia = false;
@@ -579,6 +635,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     public void pedirPrimerPlaneta() {
+        itemGuardar.setEnabled(true);
         resetVariables();
 
         lblInstruccion.setText("\tElije Su Planeta Origen");
@@ -593,11 +650,13 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     public void setPrimerPlaneta(Casilla prPlaneta) {
+         System.out.println("seeetts");
         this.primerCasilla = prPlaneta;
         pedirSegundoPlaneta();
     }
 
     public void pedirSegundoPlaneta() {
+        itemGuardar.setEnabled(false);
         ocultarCancel(false);
         btnCalcularDistancia.setEnabled(false);
         if (calcularDistancia) {
@@ -628,10 +687,12 @@ public class FramePrincipal extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     public Casilla getPrimerCasilla() {
+        System.out.println("nsnsns "+primerCasilla);
         return primerCasilla;
     }
 
     public Casilla getSegundaCasilla() {
+       
         return segundaCasilla;
     }
 
@@ -651,10 +712,12 @@ public class FramePrincipal extends javax.swing.JFrame {
         if (replay) {
             btnSiguiente.setEnabled(false);
         }
+        itemGuardar.setEnabled(false);
         panel.setEnabled(false);
         ganador=true;
     }
     public void empezarReplay(int ronda){
+        itemGuardar.setEnabled(false);
         btnEstadisticas.setEnabled(true);
         ganador=false;
         if (!replay) {
@@ -679,6 +742,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnFlotas;
     private javax.swing.JButton btnRegresar;
     private javax.swing.JButton btnSiguiente;
+    private javax.swing.JMenuItem itemGuardar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -686,8 +750,12 @@ public class FramePrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
+    private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;

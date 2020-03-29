@@ -29,6 +29,7 @@ public class EventoEnvio {
     private EnvioDeFlota envioFlota;
     private Jugador jugadorAnterior;
     private Planeta origen;
+    private Jugador ordenador;
     private Planeta destino;
     private int naves;
     private int ronda;
@@ -68,23 +69,32 @@ public class EventoEnvio {
         this.jugadorAnterior = jugadorAnterior;
     }
 
+    public Jugador getOrdenador() {
+        return ordenador;
+    }
+
+    public void setOrdenador(Jugador ordenador) {
+        this.ordenador = ordenador;
+    }
+
 
     
     
     
-    public EventoEnvio(int tipo, Planeta origen, Planeta destino, int naves,int ronda) {
+    public EventoEnvio(int tipo, Planeta origen, Planeta destino, int naves,int ronda,Jugador ordenador) {
         this.tipo = tipo;
     this.ronda=ronda;
         this.origen = origen;
         this.destino = destino;
         this.naves = naves;
+        this.ordenador=ordenador;
     }
     
     public void appendTextConsola(JPanel panel,JTextPane textPane){
         
         switch (tipo) {
             case TIPO_CONQUISTA:
-                TextoDeAcciones.appendToPane(textPane, origen.getOwner().getNombre(), origen.getOwner().getColor());
+                TextoDeAcciones.appendToPane(textPane, ordenador.getNombre(), ordenador.getColor());
                 TextoDeAcciones.appendToPane(textPane, " conquisto el Planeta ", Color.WHITE);
                 TextoDeAcciones.appendToPane(textPane, destino.getNombre()+"\n", destino.getOwner().getColor());
                 break;
@@ -93,7 +103,7 @@ public class EventoEnvio {
                 TextoDeAcciones.appendToPane(textPane, "Renfuerzos llegaron al Planeta ", Color.WHITE);
                 TextoDeAcciones.appendToPane(textPane, destino.getNombre()+"\n", destino.getOwner().getColor());
                 TextoDeAcciones.appendToPane(textPane, " desde ", Color.WHITE);
-                TextoDeAcciones.appendToPane(textPane, origen.getOwner().getNombre(), origen.getOwner().getColor());
+                TextoDeAcciones.appendToPane(textPane, ordenador.getNombre(), ordenador.getColor());
                 TextoDeAcciones.appendToPane(textPane, "("+naves+"naves)\n", Color.WHITE);
                 
                 
@@ -108,7 +118,7 @@ public class EventoEnvio {
                  }
                 
                 TextoDeAcciones.appendToPane(textPane, " se defendio ante el ataque de ", Color.WHITE);
-                TextoDeAcciones.appendToPane(textPane, origen.getOwner().getNombre()+"\n", origen.getOwner().getColor());
+                TextoDeAcciones.appendToPane(textPane, ordenador.getNombre()+"\n", ordenador.getColor());
                 break;
         }
     }

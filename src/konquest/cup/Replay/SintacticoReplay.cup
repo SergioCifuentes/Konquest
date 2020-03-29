@@ -8,10 +8,17 @@ import konquest.Replay.Objetos.*;
 private ComponenteReplay replay = new ComponenteReplay();
     public boolean error;
     public boolean errorRecuperable;
+private int rondaMayor;
 
         public ComponenteReplay getReplay(){
         return replay;
     }
+public int getRondaMayor(){
+    return rondaMayor;
+}
+public void setRondaMayor(int ronda){
+    this.rondaMayor=ronda;
+}
     void setReplay(ComponenteReplay r){
         replay =r;
     }
@@ -49,7 +56,7 @@ action code {:
     private boolean errorRecuperable=false;
 private Object[] atributosRonda = new Object[3];
 private ComponenteReplay replay = new ComponenteReplay();
-
+private int rondaMayor=0;
     private void resetearAtributosPlaneta(){
         for(int i=0;i<atributosPlaneta.length;i++){
             atributosPlaneta[i]=null;
@@ -84,7 +91,7 @@ start with Inicio;
 
 Inicio 		::= LLAVE_A Componentes LLAVE_C {:asr.setReplay(replay);
                                                         
-                                                                           asr.error=this.error;asr.errorRecuperable=this.errorRecuperable;:};
+                                                                           asr.error=this.error;asr.setRondaMayor(rondaMayor);asr.errorRecuperable=this.errorRecuperable;:};
 Componentes     ::= Componente COMA Componentes
 			|Componente ;
 Componente	::= PLANETAS  DOS_PUNTOS CORCHETE_A Planetas:partidas CORCHETE_C    {:if(replay.getPartidas()==null){
@@ -178,13 +185,16 @@ AtributoPlaneta  ::= NOMBRE DOS_PUNTOS ID_NOMBRE:nombre    {:if(atributosPlaneta
                                                              mostrarAtributoRepetido("Porcentaje",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
                                                         }:}
                         |error;
-Rondas		::= ENTERO:num DOS_PUNTOS CORCHETE_A Envios:enviosAn CORCHETE_C COMA Rondas  {:for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
+Rondas		::= ENTERO:num DOS_PUNTOS CORCHETE_A Envios:enviosAn CORCHETE_C COMA Rondas  {:if(enviosAn!=null){
+                                                                        for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
                                                                         ((ArrayList<EnvioReplay>)enviosAn).get(i).setRonda(Integer.valueOf((String)num));
-                                                                         }
-                                                                        replay.agregarEnvios(((ArrayList<EnvioReplay>)enviosAn));:}
-					| ENTERO:num DOS_PUNTOS CORCHETE_A Envios:enviosAn CORCHETE_C    {:for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
+                                                                         }replay.agregarEnvios(((ArrayList<EnvioReplay>)enviosAn));}
+                                                                        if(Integer.valueOf((String)num)>rondaMayor){rondaMayor=Integer.valueOf((String)num);}:}
+					| ENTERO:num DOS_PUNTOS CORCHETE_A Envios:enviosAn CORCHETE_C    {:if(enviosAn!=null){
+                                                                    for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
                                                                         ((ArrayList<EnvioReplay>)enviosAn).get(i).setRonda(Integer.valueOf((String)num));
-                                                                         }replay.agregarEnvios(((ArrayList<EnvioReplay>)enviosAn));:};
+                                                                         }replay.agregarEnvios(((ArrayList<EnvioReplay>)enviosAn));
+                                                                            }if(Integer.valueOf((String)num)>rondaMayor){rondaMayor=Integer.valueOf((String)num);}:};
 
 Envios		::= LLAVE_A Envio:envio LLAVE_C COMA Envios:enviosAn       {: ArrayList<EnvioReplay> envios= new ArrayList<>();
                                                                                 if(envio!=null){
@@ -199,7 +209,8 @@ Envios		::= LLAVE_A Envio:envio LLAVE_C COMA Envios:enviosAn       {: ArrayList<
                                                                         if(envio!=null){
                                                                         envios.add((EnvioReplay) envio);
                                                                         
-                                                                        } RESULT= envios;:}; 
+                                                                        } RESULT= envios;:}
+                                        |                                {:RESULT=null;:}; 
 
 Envio            ::= AtributoEnvio COMA Envio:re   {:RESULT =re;:}
 					| AtributoEnvio {:        if(EnvioReplay.verificarObligatorios(atributosRonda,asr.fp)){

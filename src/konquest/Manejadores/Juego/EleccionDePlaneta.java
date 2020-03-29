@@ -47,11 +47,14 @@ public class EleccionDePlaneta {
         }else{
             if (fp.getPrimerCasilla()!=null) {
                 if (!fp.getPrimerCasilla().getPlaneta().getNombre().equals(casilla.getPlaneta().getNombre())) {
+                    
                      fp.setSegundaCasilla(casilla);
                 }
                
             }else{
                 if (casilla.getPlaneta().getOwner()==controlDeTurnos.getJugadorEnTurnoActual()) {
+                    System.out.println("casilla "+casilla);
+                    System.out.println("casilla "+casilla.getPlaneta().getNombre());
                     fp.setPrimerPlaneta(casilla);
                 }else{
                     JOptionPane.showMessageDialog(fp, "El planeta Origen Debe Ser Tuyo", "Error", JOptionPane.ERROR_MESSAGE);

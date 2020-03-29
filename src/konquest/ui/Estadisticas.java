@@ -15,9 +15,9 @@ import javax.swing.table.DefaultTableModel;
 import konquest.Manejadores.Juego.ControlDeTurnos;
 import konquest.Manejadores.Juego.EstadisticasJugador;
 import konquest.Manejadores.Juego.Objetos.EnvioDeFlota;
-import konquest.Replay.CreadorArchivoReplay;
+import konquest.Escritores.CreadorArchivoReplay;
 import konquest.Replay.RondasReplay;
-import konquest.contrladoresUI.EscritorDeMapas;
+import konquest.Escritores.EscritorDeMapas;
 import konquest.contrladoresUI.Render;
 import konquest.mapa.Jugador;
 
