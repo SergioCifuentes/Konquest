@@ -10,6 +10,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import konquest.Manejadores.Tablero.ControladorDeColores;
 import konquest.contrladoresUI.TextoDeAcciones;
+import konquest.mapa.Jugador;
 import konquest.mapa.Planeta;
 
 /**
@@ -25,13 +26,18 @@ public class EventoEnvio {
     public static final int TIPO_CONQUISTA=1;
     public static final int TIPO_DEFENSA=2;
     public static final int TIPO_RENFUERZOS=3;
-    
+    private EnvioDeFlota envioFlota;
+    private Jugador jugadorAnterior;
     private Planeta origen;
     private Planeta destino;
     private int naves;
     private int ronda;
     public Planeta getOrigen() {
         return origen;
+    }
+
+    public int getNaves() {
+        return naves;
     }
 
     public Planeta getDestino() {
@@ -46,8 +52,24 @@ public class EventoEnvio {
         return tipo;
     }
 
+    public EnvioDeFlota getEnvioFlota() {
+        return envioFlota;
+    }
+
+    public void setEnvioFlota(EnvioDeFlota envioFlota) {
+        this.envioFlota = envioFlota;
+    }
+
+    public Jugador getJugadorAnterior() {
+        return jugadorAnterior;
+    }
+
+    public void setJugadorAnterior(Jugador jugadorAnterior) {
+        this.jugadorAnterior = jugadorAnterior;
+    }
 
 
+    
     
     
     public EventoEnvio(int tipo, Planeta origen, Planeta destino, int naves,int ronda) {

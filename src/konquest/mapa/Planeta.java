@@ -6,6 +6,7 @@
 package konquest.mapa;
 
 import java.util.ArrayList;
+import konquest.Replay.Objetos.PartidaInicial;
 import konquest.ui.FramePrincipal;
 
 /**
@@ -20,6 +21,7 @@ public class Planeta {
     protected  Jugador owner;
     protected Integer produccionOriginal;
     protected boolean neutral;
+    private PartidaInicial pi;
     
     public static boolean verificarObligatorios(Object[] atributos){
         for (int i = 0; i < 4; i++) {
@@ -35,6 +37,14 @@ public class Planeta {
 
     public void setPorcentajeMuertes(double porcentajeMuertes) {
         this.porcentajeMuertes = porcentajeMuertes;
+    }
+
+    public void setPi(PartidaInicial pi) {
+        this.pi = pi;
+    }
+
+    public PartidaInicial getPi() {
+        return pi;
     }
     
     
@@ -83,6 +93,9 @@ public class Planeta {
     }
     public void aumentarProduccion(){
         produccion++;
+    }
+        public void disminuirProduccion(){
+        produccion--;
     }
     
     public int getNaves() {

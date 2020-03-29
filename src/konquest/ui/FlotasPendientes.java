@@ -104,7 +104,7 @@ private ArrayList<EnvioDeFlota> envios;
     private void pedirEnvios(){
          envios=new ArrayList<>();
         for (int i = cdt.getCdr().getRondaActual().getNumero(); i >= 1; i--) {
-           envios.addAll(cdt.getCdf().obtenerEnviosPornJugador(cdt.getJugadorEnTurnoActual(),i));
+           envios.addAll(cdt.getCdf().obtenerEnviosPorJugador(cdt.getJugadorEnTurnoActual(),i));
         }
         
     }

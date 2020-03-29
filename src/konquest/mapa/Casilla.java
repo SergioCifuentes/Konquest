@@ -91,8 +91,26 @@ public class Casilla extends JPanel {
         this.fila = fila;
     }
 
-    public void reDibujar() {
+    public void reDibujar(boolean replay) {
+        if (replay) {
+            if (planeta.isNeutral()) {
+            
+                naves.setText(String.valueOf(planeta.getNaves()));
+            this.setBackground(ControladorDeColores.NEUTRALES);
+        } else {
+            naves.setText(String.valueOf(planeta.getNaves()));
+            if (planeta.getOwner().getColor() != null) {
+                this.setBackground(planeta.getOwner().getColor());
+            }
 
+        }
+        this.addMouseListener(new java.awt.event.MouseAdapter() {
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                PanelMouseExited(evt);
+            }});
+        }else{
         if (planeta.isNeutral()) {
             if (mostrarNaves) {
                 naves.setText(String.valueOf(planeta.getNaves()));
@@ -117,6 +135,7 @@ public class Casilla extends JPanel {
                 PanelMouseClicked(evt);
             }
         });
+        }
     }
 
     public void setPlaneta(Planeta planeta, Mapa mapa) {
@@ -127,39 +146,63 @@ public class Casilla extends JPanel {
         this.mostrarEstadisticas = mapa.getConfiNeutrales().isMostrarEstadisticas();
         this.mostrarNaves = mapa.getConfiNeutrales().isMostrarNaves();
 
-        if (planeta.isNeutral()) {
-            if (mapa.getConfiNeutrales().isMostrarNaves()) {
+        if (cdt != null && edp != null) {
+            if (planeta.isNeutral()) {
+                if (mapa.getConfiNeutrales().isMostrarNaves()) {
+                    naves.setText(String.valueOf(planeta.getNaves()));
+                }
+                this.setBackground(ControladorDeColores.NEUTRALES);
+            } else {
                 naves.setText(String.valueOf(planeta.getNaves()));
+                if (planeta.getOwner().getColor() != null) {
+                    this.setBackground(planeta.getOwner().getColor());
+                }
             }
-            this.setBackground(ControladorDeColores.NEUTRALES);
+
+            this.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    PanelMouseEntered(evt);
+                }
+
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    PanelMouseExited(evt);
+                }
+
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    PanelMouseClicked(evt);
+                }
+            });
+
         } else {
-            naves.setText(String.valueOf(planeta.getNaves()));
-            if (planeta.getOwner().getColor() != null) {
+            if (planeta.isNeutral()) {
+                naves.setText(String.valueOf(planeta.getNaves()));
+
+                this.setBackground(ControladorDeColores.NEUTRALES);
+            } else {
+                naves.setText(String.valueOf(planeta.getNaves()));
                 this.setBackground(planeta.getOwner().getColor());
             }
+
+            this.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    PanelMouseEntered(evt);
+                }
+
+                @Override
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    PanelMouseExited(evt);
+                }
+            });
         }
-
-        this.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                PanelMouseEntered(evt);
-            }
-
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                PanelMouseExited(evt);
-            }
-
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                PanelMouseClicked(evt);
-            }
-        });
 
     }
 
     private void PanelMouseClicked(java.awt.event.MouseEvent evt) {
-        if (planeta != null) {
+        if (planeta != null&&!cdt.getFramePrincipal().isGanador()) {
             edp.obtenerEleccionPlaneta(this);
         }
 
@@ -168,41 +211,61 @@ public class Casilla extends JPanel {
     private void PanelMouseEntered(java.awt.event.MouseEvent evt) {
 
         this.setBackground(ControladorDeColores.obtenerColorAlSeleccionar(this.getBackground()));
+        if (cdt != null && edp != null) {
+            if (getPlaneta().getOwner() != null) {
+                if (cdt.getJugadorEnTurnoActual().equals(this.planeta.getOwner())) {
+                    this.setToolTipText("<html>Planeta: " + getPlaneta().getNombre() + "<br>"
+                            + "Dueño: " + getPlaneta().getOwner().getNombre() + "<br>"
+                            + "Naves: " + getPlaneta().getNaves() + "<br>"
+                            + "Produccion: " + getPlaneta().getProduccion() + "<br>"
+                            + "PorcentajeMuertes: " + getPlaneta().getPorcentajeMuertes() + "</html>");
+                } else {
+                    if (mapaCiego) {
+                        this.setToolTipText(null);
+                    } else {
+                        this.setToolTipText("<html> Planeta: " + getPlaneta().getNombre() + "<br>"
+                                + "Dueño: " + getPlaneta().getOwner().getNombre() + "<br>"
+                                + "Naves: " + getPlaneta().getNaves() + "<br>"
+                                + "Produccion: " + getPlaneta().getProduccion() + "<br>"
+                                + "PorcentajeMuertes: " + getPlaneta().getPorcentajeMuertes() + "</html>");
+                    }
+                }
+            } else {
+                if (mostrarEstadisticas) {
+                    String textToolTip = "";
+                    textToolTip += "<html> Planeta: " + getPlaneta().getNombre() + "<br>";
+                    if (mostrarNaves) {
+                        textToolTip += "Naves: " + getPlaneta().getNaves() + "<br>";
+                    }
+                    textToolTip += "Produccion: " + getPlaneta().getProduccion() + "<br>"
+                            + "PorcentajeMuertes: " + getPlaneta().getPorcentajeMuertes() + "</html>";
+                    this.setToolTipText(textToolTip);
+                } else {
+                    if (mostrarNaves) {
+                        this.setToolTipText("<html>Planeta: " + getPlaneta().getNombre() + "<br>"
+                                + "Naves: " + getPlaneta().getNaves() + "</html>");
+                    }
+                }
+            }
+        } else {
 
-        if (getPlaneta().getOwner() != null) {
-            if (cdt.getJugadorEnTurnoActual().equals(this.planeta.getOwner())) {
+            if (getPlaneta().getOwner() != null) {
                 this.setToolTipText("<html>Planeta: " + getPlaneta().getNombre() + "<br>"
                         + "Dueño: " + getPlaneta().getOwner().getNombre() + "<br>"
                         + "Naves: " + getPlaneta().getNaves() + "<br>"
                         + "Produccion: " + getPlaneta().getProduccion() + "<br>"
                         + "PorcentajeMuertes: " + getPlaneta().getPorcentajeMuertes() + "</html>");
+
             } else {
-                if (mapaCiego) {
-                    this.setToolTipText(null);
-                } else {
-                    this.setToolTipText("<html> Planeta: " + getPlaneta().getNombre() + "<br>"
-                            + "Dueño: " + getPlaneta().getOwner().getNombre() + "<br>"
-                            + "Naves: " + getPlaneta().getNaves() + "<br>"
-                            + "Produccion: " + getPlaneta().getProduccion() + "<br>"
-                            + "PorcentajeMuertes: " + getPlaneta().getPorcentajeMuertes() + "</html>");
-                }
-            }
-        } else {
-            if (mostrarEstadisticas) {
                 String textToolTip = "";
                 textToolTip += "<html> Planeta: " + getPlaneta().getNombre() + "<br>";
-                if (mostrarNaves) {
-                    textToolTip += "Naves: " + getPlaneta().getNaves() + "<br>";
-                }
+                textToolTip += "Naves: " + getPlaneta().getNaves() + "<br>";
                 textToolTip += "Produccion: " + getPlaneta().getProduccion() + "<br>"
                         + "PorcentajeMuertes: " + getPlaneta().getPorcentajeMuertes() + "</html>";
                 this.setToolTipText(textToolTip);
-            } else {
-                if (mostrarNaves) {
-                    this.setToolTipText("<html>Planeta: " + getPlaneta().getNombre() + "<br>"
-                            + "Naves: " + getPlaneta().getNaves() + "</html>");
-                }
+
             }
+
         }
 
     }

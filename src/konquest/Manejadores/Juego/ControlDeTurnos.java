@@ -15,6 +15,7 @@ import konquest.Manejadores.Tablero.Distancias;
 import konquest.Manejadores.Tablero.ManejadorDeCasillas;
 import konquest.mapa.Jugador;
 import konquest.mapa.Mapa;
+import konquest.ui.Estadisticas;
 import konquest.ui.FramePrincipal;
 
 /**
@@ -34,32 +35,31 @@ public class ControlDeTurnos {
     public Jugador getJugadorEnTurnoActual() {
         return jugadorEnTurnoActual;
     }
-    
+
     public ControladorDeRondas getCdr() {
         return cdr;
     }
-    public Mapa getMapa(){
+
+    public Mapa getMapa() {
         return mapa;
     }
 
     public ControlDeFlotas getCdf() {
         return cdf;
     }
-    
-    
-    
+
     public ControlDeTurnos(Mapa mapa, ControladorDeRondas cdr, FramePrincipal fp) {
         this.cdr = cdr;
         this.fp = fp;
         this.mapa = mapa;
-        cdf=new ControlDeFlotas();
+        cdf = new ControlDeFlotas();
         flotasDeTurno = new ArrayList<>();
         this.jugadoresEnOrden = mapa.getJugadores();
         jugadorEnTurnoActual = mapa.getJugadores().get(0);
         empezarTurnos();
         mandarInfoAFram();
     }
-    
+
     public void terminarTurno(ArrayList<EnvioDeFlota> flotas) {
         System.out.println(flotas);
         if (!(flotas == null) && !(flotas.isEmpty())) {
@@ -68,10 +68,13 @@ public class ControlDeTurnos {
         flotasDeTurno = new ArrayList<>();
         for (int i = 0; i < jugadoresEnOrden.size(); i++) {
             if (i == jugadoresEnOrden.size() - 1) {
-                cdr.terminarRonda(cdf,this);
-                jugadorEnTurnoActual = jugadoresEnOrden.get(0);
-                empezarTurnos();
-                break;
+                cdr.terminarRonda(cdf, this);
+                if (!fp.isGanador()) {
+                    jugadorEnTurnoActual = jugadoresEnOrden.get(0);
+                    empezarTurnos();
+                    break;
+                }
+
             } else {
                 if (jugadoresEnOrden.get(i).equals(jugadorEnTurnoActual)) {
                     jugadorEnTurnoActual = jugadoresEnOrden.get(i + 1);
@@ -83,51 +86,58 @@ public class ControlDeTurnos {
     }
 
     public void empezarTurnos() {
-        if (jugadorEnTurnoActual.isVivo()) {
-            
-            if (jugadorEnTurnoActual.getTipo() == Jugador.TIPO_HUMANO) {
-                mandarInfoAFram();
+        if (jugadorEnTurnoActual.getPlanetas().size() > 0) {
+            if (jugadorEnTurnoActual.isVivo()) {
+
+                if (jugadorEnTurnoActual.getTipo() == Jugador.TIPO_HUMANO) {
+                    mandarInfoAFram();
+                } else {
+                    ManejadorEnemigoPC mepc = new ManejadorEnemigoPC(mapa, jugadorEnTurnoActual);
+                    terminarTurno(mepc.realizarAtaques());
+                    redibujarTablero();
+                }
             } else {
-                ManejadorEnemigoPC mepc = new ManejadorEnemigoPC(mapa, jugadorEnTurnoActual);
-                terminarTurno(mepc.realizarAtaques());
-                redibujarTablero();
+                terminarTurno(null);
             }
         } else {
             terminarTurno(null);
         }
+
     }
 
     private void mandarInfoAFram() {
         fp.obtenerInfoDeTurno(jugadorEnTurnoActual, cdr.getRondaActual());
     }
-    
+
     public void finalizarTurno() {
         terminarTurno(flotasDeTurno);
-    }    
+    }
+
+    public void mostrarEstadistics(){
+        Estadisticas estadisticas= new Estadisticas(fp, true, jugadoresEnOrden, cdf.getEnviosEnProceso(),cdf.getEnviosRealizados());
+        estadisticas.setVisible(true);
+    }
     
     public void terminarEnvio() {
         EnvioDeFlota edf = new EnvioDeFlota(fp.getPrimerCasilla(), fp.getSegundaCasilla(),
-                 jugadorEnTurnoActual, fp.getNaves(), cdr.getRondaActual(),
+                jugadorEnTurnoActual, fp.getNaves(), cdr.getRondaActual(),
                 cdr.getRondaActual().getNumero() + Distancias.calcularDistancia(fp.getPrimerCasilla(), fp.getSegundaCasilla()));
         fp.getPrimerCasilla().getPlaneta().restarNaves(fp.getNaves());
-        
-        
+
         redibujarTablero();
         flotasDeTurno.add(edf);
         fp.pedirPrimerPlaneta();
     }
-    
-    public void redibujarTablero(){
+
+    public void redibujarTablero() {
         ManejadorDeCasillas manejadorDeCasillas = new ManejadorDeCasillas();
-        manejadorDeCasillas.reDibujarCasillas(mapa.getCasillas());
+        manejadorDeCasillas.reDibujarCasillas(mapa.getCasillas(), false);
         DibujadorDeTablero ddt = new DibujadorDeTablero();
         ddt.dibujarTablero(mapa, fp.getJPanel());
-        
+
     }
-    
-    
-    
-    public FramePrincipal getFramePrincipal(){
+
+    public FramePrincipal getFramePrincipal() {
         return fp;
     }
 }

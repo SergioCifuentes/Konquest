@@ -7,6 +7,7 @@ package konquest.mapa;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import konquest.Manejadores.Juego.EstadisticasJugador;
 import konquest.ui.FramePrincipal;
 
 /**
@@ -21,6 +22,7 @@ public class Jugador {
     private int tipo;
     private Color color;
     private boolean vivo;
+    private EstadisticasJugador estadisticas;
 
     public boolean isVivo() {
         return vivo;
@@ -61,6 +63,12 @@ public class Jugador {
         this.nombre = aux;
         this.nombresPlaneta = aux2;
         this.tipo = (Integer) atributos[2];
+        vivo=true;
+        estadisticas=new EstadisticasJugador(this);
+    }
+
+    public EstadisticasJugador getEstadisticas() {
+        return estadisticas;
     }
 
     public static boolean verificarObligatorios(Object[] atributos) {

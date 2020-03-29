@@ -8,7 +8,8 @@ package konquest.ui;
 import konquest.contrladoresUI.Render;
 import java.awt.Frame;
 import java.io.File;
-import java.util.ArrayList;import javax.swing.JButton;
+import java.util.ArrayList;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -836,11 +837,11 @@ public class EditadorMapas extends javax.swing.JDialog {
 
                 EscritorDeMapas edm = new EscritorDeMapas();
                 try {
-                       edm.escribirMapa(mapa, edm.crearFile(file, i.getNombre()));
-                       JOptionPane.showMessageDialog(this, "Guardado Con Exito");
+                    edm.escribirMapa(mapa, edm.crearFile(file, i.getNombre()));
+                    JOptionPane.showMessageDialog(this, "Guardado Con Exito");
                 } catch (Exception e) {
                 }
-                
+
             }
 
         }
@@ -904,7 +905,6 @@ public class EditadorMapas extends javax.swing.JDialog {
         DefaultTableModel dtm = (DefaultTableModel) tbtJugadores.getModel();
         int aux = comDueño.getItemCount();
 
-        System.out.println("aux " + aux);
         int rows = dtm.getRowCount();
         for (int i = 0; i < rows; i++) {
             dtm.removeRow(0);

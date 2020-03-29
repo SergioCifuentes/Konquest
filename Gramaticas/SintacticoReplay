@@ -1,0 +1,46 @@
+N: { Inicio , Componentes , Planetas, Planeta,Componente, AtributoPlaneta,Rondas, Envios, Envio, AtributoEnvio,Boolean}
+T:  {[Aa-Zz] , [0-9],_|$|-,PLANETAS , RONDAS, dueño, naves, nombre, produccion, porcentajeMuertes, Terminado filas,columnas,origen,destino,true,false}
+
+
+
+S:  {Inicio}
+P:
+Inicio 			→ {Componentes}
+Componentes     → Componente, Componentes
+					|Componente
+Componente	 →PLANETAS : [Planetas]
+					|RONDAS : {Rondas}
+					|Terminado : Boolean
+Planetas		→ { Planeta } , Planetas
+					| { Planeta } 
+Planeta			→AtributoPlaneta , AtribsPlaneta
+					| AtributoPlaneta
+AtributoPlaneta  → nombre : Id_Nombre
+					| fila : Entero
+					|columna : Entero
+					|dueño: Nombre_Jugador
+					| naves : Entero
+					| produccion : Entero
+					| porcentajeMuertes Decimal
+Rondas			→ Entero : [Envios], Rondas
+					| Entero : [Envios] 
+Envios			→{Envio} , Envios
+					| {Envio}
+Envio			→AtributoEnvio , Envio
+					| AtributoEnvio
+AtributoEnvio	  → origen : Id_Nombre
+					|destino : Id_Nombre
+					| naves : Entero
+
+Id_Nombre		→	Letra (Letra|"")^2
+Entero			→Digito Entero
+					|Digito
+
+Boolean		→ true
+					| false
+Decimal		→ Entero . Entero
+Nombre_Jugador→ Letra (Letra|Numero|"")^9
+Simbolo 		→ _|$|-
+Letra			→ [Aa-Zz]
+Digito			→ [0-9]
+

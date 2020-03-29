@@ -1,6 +1,9 @@
 N: { Inicio , Componentes , Comp , AtribsMapa , AtributoMapa , Planetas  , AtribsPlaneta , AtributoPlaneta ,
 	AtribsNeutrales , AtributoNeu Jugadores , AtribsJugador , AtributoJugador , Ids_Nombre , Dimensiones , Dimension}
-T:  {  }
+T:  {true,false,HUMANO,FACIL,DIFICIL,[Aa-Zz] , [0-9],_|$|-, MAPA, PLANETAS, PLANETAS_NEUTRALES, JUGADORES, id, tamaño, alAzar, planetasNeutrales, mapaCiego, acumular, NEUTRALES, finalizacion, naves, nombre, produccion, porcentajeMuertes, filas,columnas, mostrarEstadisticas}
+
+
+
 S:  {Inicio}
 P:
 

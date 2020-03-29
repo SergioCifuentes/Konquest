@@ -7,7 +7,6 @@ package konquest.Manejadores.Juego.Objetos;
 
 import konquest.mapa.Casilla;
 import konquest.mapa.Jugador;
-import konquest.mapa.Planeta;
 
 /**
  *
@@ -38,6 +37,10 @@ public class EnvioDeFlota {
 
     public Casilla getOrigen() {
         return origen;
+    }
+
+    public void setOrdenador(Jugador ordenador) {
+        this.ordenador = ordenador;
     }
 
     public Casilla getDestino() {

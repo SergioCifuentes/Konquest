@@ -23,14 +23,23 @@ public class ControladorJuego {
         ControladorDeRondas cdr= new ControladorDeRondas();
         ControlDeTurnos cdt =new ControlDeTurnos(mapa, cdr, fp);
         fp.setCdt(cdt);
+        fp.setReplay(false);
         EleccionDePlaneta edp =new EleccionDePlaneta(fp, cdt);
         mapa.setCasillas(mc.generarCasillas(mapa.getDimension().width, mapa.getDimension().height,cdt,edp));
         ControladorDeColores cdc = new ControladorDeColores();
         cdc.generarColores(mapa.getJugadores());
         iniciarPosiciones(mapa);
-        
+        agregarNavesProducidasIniciales(mapa.getJugadores());
         DibujadorDeTablero ddt = new DibujadorDeTablero();
         ddt.dibujarTablero(mapa, fp.getJPanel());
+    }
+    
+    public static void agregarNavesProducidasIniciales(ArrayList<Jugador> jugadores){
+        for (int i = 0; i < jugadores.size(); i++) {
+            for (int j = 0; j < jugadores.get(i).getPlanetas().size(); j++) {
+                jugadores.get(i).getEstadisticas().aumentarNavesProducidas(jugadores.get(i).getPlanetas().get(j).getNaves());
+            }
+        }
     }
     
     

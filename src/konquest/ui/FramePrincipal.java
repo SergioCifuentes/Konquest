@@ -7,21 +7,17 @@ package konquest.ui;
 
 import java.awt.Color;
 import java.io.File;
-import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
-import javax.swing.text.AttributeSet;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
 import konquest.Manejadores.Json.ArchivoDeEntradaJson;
 import konquest.Manejadores.Juego.ControlDeTurnos;
-import konquest.Manejadores.Juego.Objetos.EventoEnvio;
 import konquest.Manejadores.Juego.Objetos.Ronda;
+import konquest.Replay.ManejadorDeEntrada;
+import konquest.Replay.RondasReplay;
 import konquest.contrladoresUI.TextoDeAcciones;
 import konquest.mapa.Casilla;
 import konquest.mapa.Jugador;
@@ -41,7 +37,10 @@ public class FramePrincipal extends javax.swing.JFrame {
     private final static String TEXTO_TERMINAR_TURNO = "Fin Turno";
     private final static String TEXTO_ENVIAR = "Enviar";
     private ControlDeTurnos cdt;
+    private RondasReplay rr;
     private JPanel pane;
+    private boolean replay;
+    private boolean ganador;
 
     /**
      * Creates new form FramePrincipal
@@ -49,6 +48,10 @@ public class FramePrincipal extends javax.swing.JFrame {
     public FramePrincipal() {
         initComponents();
         agregarFondo();
+        replay=false;
+        ganador=false;
+        btnRegresar.setVisible(false);
+        btnSiguiente.setVisible(false);
         btnCancel.setVisible(false);
         pane = new JPanel();
     }
@@ -85,6 +88,8 @@ public class FramePrincipal extends javax.swing.JFrame {
         jScrollPane3 = new javax.swing.JScrollPane();
         jScrollPane4 = new javax.swing.JScrollPane();
         paneAcciones = new javax.swing.JTextPane();
+        btnRegresar = new javax.swing.JButton();
+        btnSiguiente = new javax.swing.JButton();
         menu = new javax.swing.JMenuBar();
         menuOpen = new javax.swing.JMenu();
         menuItemOpen = new javax.swing.JMenuItem();
@@ -250,6 +255,26 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         jScrollPane3.setViewportView(jScrollPane4);
 
+        btnRegresar.setBackground(new java.awt.Color(254, 254, 254));
+        btnRegresar.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        btnRegresar.setForeground(new java.awt.Color(23, 13, 99));
+        btnRegresar.setText("Regresar");
+        btnRegresar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegresarActionPerformed(evt);
+            }
+        });
+
+        btnSiguiente.setBackground(new java.awt.Color(254, 254, 254));
+        btnSiguiente.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        btnSiguiente.setForeground(new java.awt.Color(23, 13, 99));
+        btnSiguiente.setText("Siguiente");
+        btnSiguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSiguienteActionPerformed(evt);
+            }
+        });
+
         menuOpen.setText("Game");
 
         menuItemOpen.setText("Jugar");
@@ -261,9 +286,19 @@ public class FramePrincipal extends javax.swing.JFrame {
         menuOpen.add(menuItemOpen);
 
         jMenuItem1.setText("Cargar Partida");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
         menuOpen.add(jMenuItem1);
 
         jMenuItem2.setText("Replay");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
         menuOpen.add(jMenuItem2);
 
         menuItemOnline.setText("Online");
@@ -306,19 +341,27 @@ public class FramePrincipal extends javax.swing.JFrame {
                         .addContainerGap())
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lblRonda, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                        .addComponent(lblRonda, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnRegresar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnSiguiente)
+                        .addGap(158, 158, 158))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(barTurnos, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 265, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(14, 14, 14)
-                .addComponent(lblRonda))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblRonda)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(btnRegresar)
+                        .addComponent(btnSiguiente))))
         );
 
         pack();
@@ -334,7 +377,7 @@ public class FramePrincipal extends javax.swing.JFrame {
             removerTextoAcciones();
             panel.removeAll();
             ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
-            adej.abrirAchivo(file, this);
+            adej.abrirAchivo(file, this, true);
 
         }
     }//GEN-LAST:event_menuItemOpenActionPerformed
@@ -349,7 +392,11 @@ public class FramePrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnCalcularDistanciaActionPerformed
 
     private void btnEstadisticasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEstadisticasActionPerformed
-        // TODO add your handling code here:
+        if (replay) {
+            rr.mostrarEstadistics();
+        }else{
+            cdt.mostrarEstadistics();
+        }
     }//GEN-LAST:event_btnEstadisticasActionPerformed
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
@@ -384,9 +431,72 @@ public class FramePrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemEditActionPerformed
 
     private void memuItemNewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_memuItemNewActionPerformed
-        EditadorMapas ed= new EditadorMapas(this, calcularDistancia,this);
+        EditadorMapas ed = new EditadorMapas(this, calcularDistancia, this);
         ed.setVisible(true);
     }//GEN-LAST:event_memuItemNewActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        JFileChooser jfc = new JFileChooser();
+        jfc.setDialogTitle("Seleccione El Archivo Mapa .JSON");
+        
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jfc.showOpenDialog(this);
+        file = jfc.getSelectedFile();
+        if (file != null) {
+            removerTextoAcciones();
+            panel.removeAll();
+            ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
+            adej.abrirAchivo(file, this, false);
+            if (adej.getMapa() != null) {
+                JFileChooser jfc1 = new JFileChooser();
+                jfc1.setDialogTitle("Seleccione El Archivo Replay .JSON");
+                jfc1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                jfc1.showOpenDialog(this);
+                file = jfc1.getSelectedFile();
+                if (file != null) {
+                    ManejadorDeEntrada mde = new ManejadorDeEntrada();
+                    mde.abrirAchivo(file, this, adej.getMapa(),true);
+                }
+            }
+        }
+
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        JFileChooser jfc = new JFileChooser();
+        jfc.setDialogTitle("Seleccione El Archivo Mapa .JSON");
+        
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jfc.showOpenDialog(this);
+        file = jfc.getSelectedFile();
+        if (file != null) {
+            removerTextoAcciones();
+            panel.removeAll();
+            ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
+            adej.abrirAchivo(file, this, false);
+            if (adej.getMapa() != null) {
+                JFileChooser jfc1 = new JFileChooser();
+                jfc1.setDialogTitle("Seleccione El Archivo Guardado .JSON");
+                jfc1.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                jfc1.showOpenDialog(this);
+                file = jfc1.getSelectedFile();
+                if (file != null) {
+                    ManejadorDeEntrada mde = new ManejadorDeEntrada();
+                    mde.abrirAchivo(file, this, adej.getMapa(),false);
+                }
+            }
+        }
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void btnSiguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSiguienteActionPerformed
+        rr.nextRonda();
+        btnRegresar.setEnabled(true);
+    }//GEN-LAST:event_btnSiguienteActionPerformed
+
+    private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
+        rr.returnRonda();
+        btnSiguiente.setEnabled(true);
+    }//GEN-LAST:event_btnRegresarActionPerformed
     private void enviar() {
         if (numeroTopas.getText() != null) {
             try {
@@ -434,19 +544,21 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     }
 
-    public void agregarTextoAcciones(String texto) {
-        
-        TextoDeAcciones.appendToPane(paneAcciones, texto, Color.WHITE);
+    public boolean isGanador() {
+        return ganador;
     }
 
+    public void agregarTextoAcciones(String texto) {
 
+        TextoDeAcciones.appendToPane(paneAcciones, texto, Color.WHITE);
+    }
 
     public void removerTextoAcciones() {
         paneAcciones.setText("");
     }
 
     public void obtenerInfoDeTurno(Jugador jugador, Ronda ronda) {
-
+        ganador=false;
         lblTurno.setText("Turno: " + jugador.getNombre());
         lblRonda.setText("Ronda: " + ronda.getNumero());
 
@@ -476,6 +588,10 @@ public class FramePrincipal extends javax.swing.JFrame {
         this.cdt = cdt;
     }
 
+    public void setRr(RondasReplay rr) {
+        this.rr = rr;
+    }
+
     public void setPrimerPlaneta(Casilla prPlaneta) {
         this.primerCasilla = prPlaneta;
         pedirSegundoPlaneta();
@@ -491,6 +607,11 @@ public class FramePrincipal extends javax.swing.JFrame {
         }
 
     }
+
+    public void setReplay(boolean replay) {
+        this.replay = replay;
+    }
+    
 
     public void setSegundaCasilla(Casilla segunda) {
         this.segundaCasilla = segunda;
@@ -518,14 +639,36 @@ public class FramePrincipal extends javax.swing.JFrame {
         return calcularDistancia;
     }
 
-    public JPanel getJPanelAcciones(){
+    public JPanel getJPanelAcciones() {
         return pane;
     }
-    
-    public JTextPane getJTextPane(){
-    return paneAcciones;
+
+    public JTextPane getJTextPane() {
+        return paneAcciones;
     }
 
+    public void MarcarGanador(){
+        if (replay) {
+            btnSiguiente.setEnabled(false);
+        }
+        panel.setEnabled(false);
+        ganador=true;
+    }
+    public void empezarReplay(int ronda){
+        btnEstadisticas.setEnabled(true);
+        ganador=false;
+        if (!replay) {
+         replay=true;
+         btnRegresar.setVisible(true);
+         btnSiguiente.setVisible(true);
+        }
+        if (ronda==1) {
+            btnRegresar.setEnabled(false);
+        }else{
+            btnRegresar.setEnabled(true);
+        }
+        lblRonda.setText("Ronda: " + ronda);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JToolBar barTurnos;
@@ -534,6 +677,8 @@ public class FramePrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnEnvio;
     private javax.swing.JButton btnEstadisticas;
     private javax.swing.JButton btnFlotas;
+    private javax.swing.JButton btnRegresar;
+    private javax.swing.JButton btnSiguiente;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

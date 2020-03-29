@@ -1,0 +1,83 @@
+{
+	terminado:true,
+	PLANETAS:[
+		{
+			nombre: "A",
+			fila: 10,
+			columna:0,
+			dueño: "Jose",
+			naves: 10,
+			produccion: 5,
+			porcentajeMuertes : 0.5
+		},
+		{
+			nombre: "B",
+			fila:4,
+			columna:10,
+			dueño: "pc1",
+			naves: 5,
+			produccion: 5,
+			porcentajeMuertes : 0.5
+		},
+		{
+			nombre: "C",
+			fila:4,
+			columna:2,
+			dueño: "Jose",
+			naves: 5,
+			produccion: 5,
+			porcentajeMuertes : 0.5
+		},
+		{
+			nombre: "D",
+			fila:4,
+			columna:3,
+			naves: 5,
+			produccion: 5,
+			porcentajeMuertes : 0.5
+		},
+		{
+			nombre: "E",
+			fila:6,
+			columna:2,
+			naves: 5,
+			produccion: 5,
+			porcentajeMuertes : 0.5
+		},	
+		{
+			nombre: "F",
+			fila:9,
+			columna:1,
+			naves: 5,
+			produccion: 5,
+			porcentajeMuertes : 0.5
+		}
+	],
+	RONDAS:{
+	1:[
+		{
+			origen: "A",
+			destino:"B",
+			naves: 10
+		},
+		{
+			origen: "B",
+			destino:"A",
+			naves:3
+		}	
+	],
+	2:[
+		{
+			origen: "A",
+			destino:"B",
+			naves: 1
+		},
+		{
+			origen: "B",
+			destino:"A",
+			naves:4
+		}	
+	]
+	}
+	
+}

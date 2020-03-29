@@ -25,8 +25,9 @@ import konquest.ui.EditadorMapas;
  * @author sergio
  */
 public class ArchivoDeEntradaJson {
-
-    public void abrirAchivo(File file, FramePrincipal frame) {
+    private Mapa mapa;
+    private boolean error=false;
+    public void abrirAchivo(File file, FramePrincipal frame,boolean jugar) {
         if (file.getPath().endsWith(".Json")) {
             try {
                 BufferedReader br = new BufferedReader(new FileReader(file));
@@ -36,6 +37,7 @@ public class ArchivoDeEntradaJson {
                 asj.setFrame(frame);
                 asj.parse();
                 if (asj.error) {
+                    error=true;
                     frame.agregarTextoAcciones("Arregle Los ERRORES Para Poder Abrir El Mapa\n");
                 } else {
                     if (asj.errorRecuperable) {
@@ -43,13 +45,15 @@ public class ArchivoDeEntradaJson {
                     }else{
                         frame.agregarTextoAcciones("Mapa Cargada con Exito\n");
                     }
-                    Mapa mapa = asj.getMapa();
-                    
-                    ControladorJuego idj=new ControladorJuego();
+                    this.mapa = asj.getMapa();
+                    if (jugar) {
+                        ControladorJuego idj=new ControladorJuego();
                     idj.iniciarJuego(mapa, frame);
+                    }
+                    
                     
                 }
-                frame.agregarTextoAcciones("=====================================================");
+                frame.agregarTextoAcciones("=====================================================\n");
             } catch (FileNotFoundException ex) {
                 Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
@@ -62,6 +66,14 @@ public class ArchivoDeEntradaJson {
             JOptionPane.showMessageDialog(frame, "El Archivo Debe Ser '.Json'", "Error Al Cargar", JOptionPane.ERROR_MESSAGE);
         }
 
+    }
+
+    public Mapa getMapa() {
+        return mapa;
+    }
+
+    public boolean isError() {
+        return error;
     }
     
     public void abrirAchivoParaEditar(File file, FramePrincipal frame){

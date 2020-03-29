@@ -29,6 +29,10 @@ public class ControlDeFlotas {
 
     }
 
+    public ArrayList<EnvioDeFlota> getEnviosEnProceso() {
+        return enviosEnProceso;
+    }
+
     public void GuardarEnvioPorTurno(ArrayList<EnvioDeFlota> enviosNuevos) {
         for (int i = 0; i < enviosNuevos.size(); i++) {
             enviosEnProceso.add(enviosNuevos.get(i));
@@ -62,50 +66,52 @@ public class ControlDeFlotas {
             cdt.getFramePrincipal().removerTextoAcciones();
         }
         int in = 0;
-        System.out.println("en "+enviosEnProceso.size());
         for (int i = 0; i < enviosEnProceso.size(); i++) {
+
             if (cdt.getCdr().getRondaActual().getNumero() == enviosEnProceso.get(i).getTurnoDestino()) {
                 eventos.add(realizarEnvio(enviosEnProceso.get(i)));
                 enviosRealizados.add(enviosEnProceso.get(i));
+                in++;
             } else {
-              
+
                 break;
             }
-            in=i;
+
         }
         if (MOSTRAR_TODOS_LOS_EVENTOS) {
-                    this.informarEventos(eventos, cdt);
-                } else {
-                    this.informarEventos(obtenerEventosDeHumanos(cdt.getCdr().getRondaActual().getNumero()), cdt);
-                }
-                for (int j = 0; j < in; j++) {
-                    enviosEnProceso.remove(0);
-                }
+            this.informarEventos(eventos, cdt);
+        } else {
+            this.informarEventos(obtenerEventosDeHumanos(cdt.getCdr().getRondaActual().getNumero()), cdt);
+        }
+        for (int j = 0; j < in; j++) {
+            enviosEnProceso.remove(0);
+        }
 
-                cdt.redibujarTablero();
+        cdt.redibujarTablero();
         cdt.redibujarTablero();
     }
 
-    public  ArrayList<EnvioDeFlota> obtenerEnviosPornJugador(Jugador jugador,int ronda){
+    public ArrayList<EnvioDeFlota> obtenerEnviosPorJugador(Jugador jugador, int ronda) {
         ordenarEnvios();
-        ArrayList<EnvioDeFlota> envios=new ArrayList<>();
-        for (int i = 0; i<enviosEnProceso.size()  ; i++) {
-            if (enviosEnProceso.get(i).getRonda().getNumero()==ronda && enviosEnProceso.get(i).getOrdenador()==jugador) {
+        ArrayList<EnvioDeFlota> envios = new ArrayList<>();
+        for (int i = 0; i < enviosEnProceso.size(); i++) {
+            if (enviosEnProceso.get(i).getRonda().getNumero() == ronda && enviosEnProceso.get(i).getOrdenador() == jugador) {
                 envios.add(enviosEnProceso.get(i));
-            }else if(enviosEnProceso.get(i).getRonda().getNumero()>ronda){
+            } else if (enviosEnProceso.get(i).getRonda().getNumero() > ronda) {
                 break;
             }
         }
         return envios;
     }
-    
-    
-    private void informarEventos(ArrayList<EventoEnvio> edfs, ControlDeTurnos cdt) {
-        System.out.println("sizeedasdwda " + edfs.size());
 
+    public ArrayList<EnvioDeFlota> getEnviosRealizados() {
+        return enviosRealizados;
+    }
+
+    private void informarEventos(ArrayList<EventoEnvio> edfs, ControlDeTurnos cdt) {
         if (edfs.size() > 0) {
 
-            TextoDeAcciones.appendToPane(cdt.getFramePrincipal().getJTextPane(), "Ronda " + cdt.getCdr().getRondaActual().getNumero() + ": \n", Color.BLACK);
+            TextoDeAcciones.appendToPane(cdt.getFramePrincipal().getJTextPane(), "Ronda " + cdt.getCdr().getRondaActual().getNumero() + ": \n", Color.WHITE);
 
         }
         for (int i = 0; i < edfs.size(); i++) {
@@ -131,7 +137,7 @@ public class ControlDeFlotas {
         return eventosDeHumano;
     }
 
-    private EventoEnvio realizarEnvio(EnvioDeFlota envio) {
+    public static EventoEnvio realizarEnvio(EnvioDeFlota envio) {
         if (envio.getDestino().getPlaneta().getOwner() != null) {
             if (envio.getDestino().getPlaneta().getOwner() == envio.getOrdenador()) {
                 envio.getDestino().getPlaneta().recibirNavesAleadas(envio.getNaves());
@@ -144,11 +150,24 @@ public class ControlDeFlotas {
 
         if (ataqueOrigen > defensaDestino) {
             Double navesRestantes = (ataqueOrigen - defensaDestino) / envio.getOrigen().getPlaneta().getPorcentajeMuertes();
-
+            if (!envio.getOrdenador().isVivo()) {
+                envio.getOrdenador().setVivo(true);
+            }
+            if (envio.getDestino().getPlaneta().getOwner() != null) {
+                
+                envio.getDestino().getPlaneta().getOwner().getPlanetas().remove(envio.getDestino().getPlaneta());
+            }
+            envio.getOrdenador().agregarPlaneta(envio.getDestino().getPlaneta());
+            if (navesRestantes.intValue()==0) {
+                navesRestantes++;
+            }
             envio.getDestino().getPlaneta().serConquistado(envio.getOrdenador(), navesRestantes.intValue());
             return new EventoEnvio(EventoEnvio.TIPO_CONQUISTA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino());
         } else {
             Double navesRestantes = (defensaDestino - ataqueOrigen) / envio.getDestino().getPlaneta().getPorcentajeMuertes();
+            if (navesRestantes.intValue()==0) {
+                navesRestantes++;
+            }
             envio.getDestino().getPlaneta().setNaves(navesRestantes.intValue());
 
             return new EventoEnvio(EventoEnvio.TIPO_DEFENSA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino());

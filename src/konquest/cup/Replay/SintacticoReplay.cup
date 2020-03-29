@@ -1,0 +1,235 @@
+package konquest.cup.Replay;
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import konquest.ui.FramePrincipal;
+import konquest.Replay.Objetos.*;
+
+ parser code {:
+private ComponenteReplay replay = new ComponenteReplay();
+    public boolean error;
+    public boolean errorRecuperable;
+
+        public ComponenteReplay getReplay(){
+        return replay;
+    }
+    void setReplay(ComponenteReplay r){
+        replay =r;
+    }
+
+    protected FramePrincipal fp;
+    public  void setFrame(FramePrincipal frame){
+        fp =frame;
+    }
+
+
+    public void syntax_error(Symbol s){
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        fp.agregarTextoAcciones("Error Sintactico Recuperado\n");
+        fp.agregarTextoAcciones("\t \tLexema: "+ lexema+"\n");
+        fp.agregarTextoAcciones("\t \tFila: "+ fila+"\n");
+        fp.agregarTextoAcciones("\t \tColumna: "+ columna+"\n");
+    }
+
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception{
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        fp.agregarTextoAcciones("Error Sintactico Panic Mode\n");
+        fp.agregarTextoAcciones("\t \tLexema: "+ lexema+"\n");
+        fp.agregarTextoAcciones("\t \tFila: "+ fila+"\n");
+        fp.agregarTextoAcciones("\t \tColumna: "+ columna+"\n");
+    }
+:}
+
+action code {:
+    private Object[] atributosPlaneta = new Object[7];
+    private boolean error =false;
+    private boolean errorRecuperable=false;
+private Object[] atributosRonda = new Object[3];
+private ComponenteReplay replay = new ComponenteReplay();
+
+    private void resetearAtributosPlaneta(){
+        for(int i=0;i<atributosPlaneta.length;i++){
+            atributosPlaneta[i]=null;
+        }
+    }
+private void resetearAtributosRondas(){
+        for(int i=0;i<atributosRonda.length;i++){
+            atributosRonda[i]=null;
+        }
+    }
+        protected void mostrarAtributoRepetido(String atributo, Symbol s,AnalizadorSintacticoReplay asr) {
+
+        asr.fp.agregarTextoAcciones("El atributo " + atributo + " se encuentra repetido\n");
+
+        asr.fp.agregarTextoAcciones("\t \tFila: " + s.right + "\n");
+        asr.fp.agregarTextoAcciones("\t \tColumna: " + s.left + "\n");
+
+    }
+
+:}
+
+/* Terminals (tokens returned by the scanner). */
+terminal PLANETAS , RONDAS, DUE, NAVES, NOMBRE, PRODUCCION, PORCENTAJE_MUERTES , TERMINADO, FILA,COLUMNA, ORIGEN , DESTINO ,TRUE,FALSE,
+LLAVE_A,LLAVE_C,DOS_PUNTOS,COMA,CORCHETE_A,CORCHETE_C,ENTERO,DECIMAL; 
+terminal String ID_NOMBRE , NOMBRE_JUGADOR ,     ERROR;
+
+/* Non-terminals */
+non terminal    Inicio , Componentes , Planetas, Planeta,Componente, AtributoPlaneta,Rondas, Envios, Envio, AtributoEnvio,Boolean;
+
+
+start with Inicio;
+
+Inicio 		::= LLAVE_A Componentes LLAVE_C {:asr.setReplay(replay);
+                                                        
+                                                                           asr.error=this.error;asr.errorRecuperable=this.errorRecuperable;:};
+Componentes     ::= Componente COMA Componentes
+			|Componente ;
+Componente	::= PLANETAS  DOS_PUNTOS CORCHETE_A Planetas:partidas CORCHETE_C    {:if(replay.getPartidas()==null){
+                                                                        replay.setPartidas((ArrayList<PartidaInicial>) partidas);
+                                                                       
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    mostrarAtributoRepetido("PLANETAS",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                                    RESULT = null;} 
+                                                                    :}
+                    |RONDAS DOS_PUNTOS LLAVE_A Rondas:rondas LLAVE_C    
+                                                                    
+                    |TERMINADO DOS_PUNTOS Boolean:terminado           {:if(replay.isTerminado()==null){
+                                                                        replay.setTerminado((Boolean) terminado);
+                                                                       
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    mostrarAtributoRepetido("terminado",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                                    RESULT = null;} 
+                                                                    :}
+                    |error;
+Planetas        ::= LLAVE_A Planeta:planeta LLAVE_C COMA Planetas:planetas   {: ArrayList<PartidaInicial> partidaInicialesNuevas= new ArrayList<>();
+                                                                                if(planeta!=null){
+                                                                        partidaInicialesNuevas.add((PartidaInicial) planeta);
+                                                                        }
+                                                                        for(int i=0;i<((ArrayList<PartidaInicial>)planetas).size();i++){
+                                                                        partidaInicialesNuevas.add(((ArrayList<PartidaInicial>)planetas).get(i));
+                                                                         }
+                                                                         RESULT= partidaInicialesNuevas;:}
+                    | LLAVE_A Planeta:planeta LLAVE_C                   {:
+                                                                        ArrayList<PartidaInicial> partidaInicialesNuevas= new ArrayList<>();
+                                                                        if(planeta!=null){
+                                                                        partidaInicialesNuevas.add((PartidaInicial) planeta);
+                                                                        
+                                                                        } RESULT= partidaInicialesNuevas;:}; 
+
+
+Planeta		::= AtributoPlaneta COMA Planeta:re    {:RESULT = re;:} 
+                    | AtributoPlaneta {:        if(PartidaInicial.verificarObligatorios(atributosPlaneta,asr.fp)){
+                                                                        PartidaInicial pi=new PartidaInicial(atributosPlaneta);
+                                                                       RESULT = pi;
+
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();:} ;
+
+AtributoPlaneta  ::= NOMBRE DOS_PUNTOS ID_NOMBRE:nombre    {:if(atributosPlaneta[0]==null){
+                                                        atributosPlaneta[0]=(String)nombre;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Nombre",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+			| FILA DOS_PUNTOS ENTERO:numero        {:if(atributosPlaneta[1]==null){
+                                                        atributosPlaneta[1]=Integer.valueOf((String)numero);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Fila",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+
+			|COLUMNA DOS_PUNTOS ENTERO:numero      {:if(atributosPlaneta[2]==null){
+                                                        atributosPlaneta[2]=Integer.valueOf((String)numero);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Columna",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+			|DUE DOS_PUNTOS NOMBRE_JUGADOR:nombre  {:if(atributosPlaneta[3]==null){
+                                                        atributosPlaneta[3]=(String)nombre;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("dueño",((java_cup.runtime.Symbol)CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+			| NAVES DOS_PUNTOS ENTERO:numero       {:if(atributosPlaneta[4]==null){
+                                                        atributosPlaneta[4]=Integer.valueOf((String)numero);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("naves",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+			| PRODUCCION DOS_PUNTOS ENTERO:numero  {:if(atributosPlaneta[5]==null){
+                                                        atributosPlaneta[5]=Integer.valueOf((String)numero);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Produccion",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+			| PORCENTAJE_MUERTES DOS_PUNTOS DECIMAL:numero {:if(atributosPlaneta[6]==null){
+                                                        atributosPlaneta[6]=Double.valueOf((String)numero);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("Porcentaje",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+                        |error;
+Rondas		::= ENTERO:num DOS_PUNTOS CORCHETE_A Envios:enviosAn CORCHETE_C COMA Rondas  {:for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
+                                                                        ((ArrayList<EnvioReplay>)enviosAn).get(i).setRonda(Integer.valueOf((String)num));
+                                                                         }
+                                                                        replay.agregarEnvios(((ArrayList<EnvioReplay>)enviosAn));:}
+					| ENTERO:num DOS_PUNTOS CORCHETE_A Envios:enviosAn CORCHETE_C    {:for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
+                                                                        ((ArrayList<EnvioReplay>)enviosAn).get(i).setRonda(Integer.valueOf((String)num));
+                                                                         }replay.agregarEnvios(((ArrayList<EnvioReplay>)enviosAn));:};
+
+Envios		::= LLAVE_A Envio:envio LLAVE_C COMA Envios:enviosAn       {: ArrayList<EnvioReplay> envios= new ArrayList<>();
+                                                                                if(envio!=null){
+                                                                        envios.add((EnvioReplay) envio);
+                                                                        }
+                                                                        for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
+                                                                        envios.add(((ArrayList<EnvioReplay>)enviosAn).get(i));
+                                                                         }
+                                                                         RESULT= envios;:}
+
+					| LLAVE_A Envio:envio LLAVE_C {:  ArrayList<EnvioReplay> envios= new ArrayList<>();
+                                                                        if(envio!=null){
+                                                                        envios.add((EnvioReplay) envio);
+                                                                        
+                                                                        } RESULT= envios;:}; 
+
+Envio            ::= AtributoEnvio COMA Envio:re   {:RESULT =re;:}
+					| AtributoEnvio {:        if(EnvioReplay.verificarObligatorios(atributosRonda,asr.fp)){
+                                                                        EnvioReplay pi=new EnvioReplay(atributosRonda);
+                                                                       RESULT = pi;
+
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosRondas();:};
+
+AtributoEnvio	  ::= ORIGEN DOS_PUNTOS ID_NOMBRE:nombre   {:if(atributosRonda[0]==null){
+                                                        atributosRonda[0]=(String)nombre;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("origen",((java_cup.runtime.Symbol)CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+                        |DESTINO DOS_PUNTOS ID_NOMBRE:nombre   {:if(atributosRonda[1]==null){
+                                                        atributosRonda[1]=(String)nombre;
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("destino",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+			| NAVES DOS_PUNTOS ENTERO:numero   {:if(atributosRonda[2]==null){
+                                                        atributosRonda[2]=Integer.valueOf((String)numero);
+                                                        }else{
+                                                            errorRecuperable=true;
+                                                             mostrarAtributoRepetido("naves",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoReplay$stack.peek()),asr);
+                                                        }:}
+                        |error;
+
+Boolean		::= TRUE    {:RESULT=true;:}
+                    | FALSE {:RESULT=false;:};
