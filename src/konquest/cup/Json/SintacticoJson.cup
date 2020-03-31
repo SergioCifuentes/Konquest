@@ -1,4 +1,6 @@
 package konquest.cup.Json;
+import konquest.contrladoresUI.TextoDeAcciones;
+import java.awt.Color;
 import java.awt.Dimension;
 import java_cup.runtime.Symbol;
 import java.util.ArrayList;
@@ -38,6 +40,43 @@ import konquest.mapa.*;
         fp.agregarTextoAcciones("\t \tLexema: "+ lexema+"\n");
         fp.agregarTextoAcciones("\t \tFila: "+ fila+"\n");
         fp.agregarTextoAcciones("\t \tColumna: "+ columna+"\n");
+    }
+
+public void ayudarConErrores(String tipo) {
+
+        String texto = "Sugerencias Para Error:\n";
+        switch (tipo) {
+            case "AtributoJugador":
+                texto += "Los Jugadores Deben De Poseer nombre,planetas y tipo"
+                        + "\nEje: \t nombre: ​ \"Jose\"​ ,\n"
+                        + "\tplanetas: [\n"
+                        + "\t\"A\"​ ,\n"
+                        + "\t\"C\"\n"
+                        + "\t],\n"
+                        + "\ttipo: HUMANO\n";
+                break;
+            case "Planeta":
+                texto += "Los Planetas Deben De Poseer nombre,naves produccion y porcentajeMuertes"
+                        + "\nEje: \t nombre: ​ \"B\"​ ,\n"
+                        + "\tnaves: ​ 15​ ,\n"
+                        + "\tproduccion: ​ 9 ​ ,\n"
+                        + "\tporcentajeMuertes: 0.40\n";
+                break;
+            case "ConfiguracionNeutral":
+                texto += "La Configuracion De Neutrales Deben De Poseer mostrarNaves, mostrarEstadisticas,produccion"
+                        + "\nEje: \t mostrarNaves: ​ true​ ,\n"
+                        + "\tmostrarEstadisticas: ​ true​ ,\n"
+                        + "\tproduccion: ​ 12";
+                break;
+            case "Mapa":
+                texto += "La Configuracion Del Mapa Debe Contener :"
+                        + "\nid,tamaño,alAzar, planetasNeutrales,mapaCiego,acumular,NEUTRALESy finalizacion";
+                break;
+            default:
+                throw new AssertionError();
+        }
+        TextoDeAcciones.appendToPane(fp.getJTextPane(), texto, Color.ORANGE);
+
     }
 :}
 
@@ -120,15 +159,27 @@ AtribsMapa      ::= AtributoMapa COMA AtribsMapa:re {:RESULT = re;:}
                                                                     error=true;
                                                                     RESULT = null;} 
                                                                     resetearAtributosMapa();:} 
-                       |error COMA AtribsMapa:re {:RESULT =re;errorRecuperable=true;:}
-                       |error   {: errorRecuperable=true;       if(Mapa.verificarObligatorios(atributosMapa,asj.fp)){
+                    |error AtribsMapa:re {:RESULT =re;asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:}
+                        |AtributoMapa error  {:       if(Mapa.verificarObligatorios(atributosMapa,asj.fp)){
                                                                         Mapa mapa = new Mapa(atributosMapa);
                                                                        RESULT = mapa;
 
                                                                     }else{
                                                                     error=true;
                                                                     RESULT = null;} 
-                                                                    resetearAtributosMapa();:};
+                                                                    resetearAtributosMapa();asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:} 
+
+                        |error {:        if(Mapa.verificarObligatorios(atributosMapa,asj.fp)){
+                                                                        Mapa mapa = new Mapa(atributosMapa);
+                                                                       RESULT = mapa;
+
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosMapa();asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:} ;
 
 
 
@@ -193,7 +244,7 @@ AtributoMapa	::= ID DOS_PUNTOS ID_MAPA:id   {:if(atributosMapa[0]==null){
                                                         }else{
                                                             errorRecuperable=true;
                                                             mostrarAtributoRepetido("Finalizar",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
-                                                       }:} ;
+                                                       }:} ; 
 
 
 Planetas        ::= LLAVE_A AtribsPlaneta:planeta LLAVE_C COMA Planetas:planetas     {:
@@ -239,14 +290,27 @@ AtribsPlaneta 	::= AtributoPlaneta COMA AtribsPlaneta:re {:RESULT =re;:}
                                                                     errorRecuperable=true;
                                                                     RESULT = null;} 
                                                                     resetearAtributosPlaneta();:} 
-                       |error COMA AtribsPlaneta:re {:RESULT =re;:}
-                       |error   {:        if(Planeta.verificarObligatorios(atributosPlaneta)){
+                       |error AtribsPlaneta:re {:RESULT =re;asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:}
+                        |AtributoPlaneta error  {:        if(Planeta.verificarObligatorios(atributosPlaneta)){
                                                                         Planeta planeta = new Planeta(atributosPlaneta);
-                                                                        RESULT = planeta;
+                                                                       RESULT = planeta;
+
                                                                     }else{
                                                                     errorRecuperable=true;
-                                                                    RESULT = null;}
-                                                                    resetearAtributosPlaneta(); :} ;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:} 
+
+                        |error {:        if(Planeta.verificarObligatorios(atributosPlaneta)){
+                                                                        Planeta planeta = new Planeta(atributosPlaneta);
+                                                                       RESULT = planeta;
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:} ;
 
 AtribsPlanetaNeutral 	::= AtributoPlaneta COMA AtribsPlanetaNeutral:re {:RESULT =re;:}
                         | AtributoPlaneta {:        if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
@@ -256,15 +320,28 @@ AtribsPlanetaNeutral 	::= AtributoPlaneta COMA AtribsPlanetaNeutral:re {:RESULT 
                                                                     }else{
                                                                     errorRecuperable=true;
                                                                     RESULT = null;} 
-                                                                    resetearAtributosPlaneta();:} 
-                       |error COMA AtribsPlanetaNeutral:re {:errorRecuperable=true;RESULT =re;:}
-                       |error   {:      errorRecuperable=true;  if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
+                                                                    resetearAtributosPlaneta();:}
+                        |error AtribsPlanetaNeutral:re {:RESULT =re;asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:}
+                        |AtributoPlaneta error  {:        if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
                                                                         PlanetaNeutral planeta = new PlanetaNeutral(atributosPlaneta);
-                                                                        RESULT = planeta;
+                                                                       RESULT = planeta;
+
                                                                     }else{
                                                                     errorRecuperable=true;
-                                                                    RESULT = null;}
-                                                                    resetearAtributosPlaneta(); :} ;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:} 
+
+                        |error {:        if(PlanetaNeutral.verificarObligatorios(atributosPlaneta)){
+                                                                        PlanetaNeutral planeta = new PlanetaNeutral(atributosPlaneta);
+                                                                       RESULT = planeta;
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();asj.ayudarConErrores("Planeta");
+                                        errorRecuperable=true;:} ;
 
 AtributoPlaneta	::= NOMBRE DOS_PUNTOS ID_NOMBRE:nombre {:if(atributosPlaneta[0]==null){
                                                         atributosPlaneta[0]=(String)nombre;
@@ -300,15 +377,28 @@ AtribsNeutrales ::= AtributoNeu COMA AtribsNeutrales:re {:RESULT =re;:}
                                                                     }else{
                                                                     error=true;
                                                                     RESULT = null;} 
-                                                                    resetearAtributosPlaneta();:} 
-                       |error COMA AtribsNeutrales:re {:errorRecuperable=true;RESULT =re;:}
-                       |error   {:      errorRecuperable=true;  if(ConfiguracionNeutrales.verificarObligatorios(atributosPlaneta)){
+                                                                    resetearAtributosPlaneta();:}
+                        |error AtribsNeutrales:re {:RESULT =re;asj.ayudarConErrores("ConfiguracionNeutral");
+                                        errorRecuperable=true;:}
+                        |AtributoNeu error  {:        if(ConfiguracionNeutrales.verificarObligatorios(atributosPlaneta)){
                                                                         ConfiguracionNeutrales confi = new ConfiguracionNeutrales(atributosPlaneta);
-                                                                        RESULT = confi;
+                                                                       RESULT = confi;
+
                                                                     }else{
                                                                     error=true;
-                                                                    RESULT = null;}
-                                                                    resetearAtributosPlaneta(); :} ;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();asj.ayudarConErrores("ConfiguracionNeutral");
+                                        errorRecuperable=true;:} 
+
+                        |error {:        if(ConfiguracionNeutrales.verificarObligatorios(atributosPlaneta)){
+                                                                        ConfiguracionNeutrales confi = new ConfiguracionNeutrales(atributosPlaneta);
+                                                                       RESULT = confi;
+
+                                                                    }else{
+                                                                    error=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosPlaneta();asj.ayudarConErrores("ConfiguracionNeutral");
+                                        errorRecuperable=true;:} ;
 
 
 AtributoNeu	::= MOSTRAR_NAVES DOS_PUNTOS Boolean: bool   {:if(atributosPlaneta[0]==null){
@@ -329,6 +419,7 @@ AtributoNeu	::= MOSTRAR_NAVES DOS_PUNTOS Boolean: bool   {:if(atributosPlaneta[0
                                                             errorRecuperable=true;
                                                              mostrarAtributoRepetido("Produccion",((java_cup.runtime.Symbol) CUP$AnalizadorSintacticoJson$stack.peek()),asj);
                                                         }:};
+                        
 
 Jugadores	::= LLAVE_A AtribsJugador:jugador LLAVE_C COMA Jugadores:jugadores   {:
                                                                                 ArrayList<Jugador> jugadoresNuevos = new ArrayList<>();
@@ -343,7 +434,7 @@ Jugadores	::= LLAVE_A AtribsJugador:jugador LLAVE_C COMA Jugadores:jugadores   {
                                                                         ArrayList<Jugador> jugadores= new ArrayList<>();
                                                                         if(jugador!=null){
                                                                         jugadores.add((Jugador) jugador);
-                                                                        } RESULT= jugadores;:}  ;
+                                                                        } RESULT= jugadores;:};
 
 
 
@@ -356,15 +447,29 @@ AtribsJugador 	::= AtributoJugador COMA AtribsJugador:re {:RESULT =re;:}
                                                                     errorRecuperable=true;
                                                                     RESULT = null;} 
                                                                     resetearAtributosJugador();:} 
-                       |error COMA AtribsJugador:re {:errorRecuperable=true;RESULT =re;:}
-                       |error   {:       errorRecuperable=true; if(Jugador.verificarObligatorios(atributosJugador)){
+                       |error AtribsJugador:re {:RESULT =re;asj.ayudarConErrores("AtributoJugador");
+                                        errorRecuperable=true;:}
+                        |AtributoJugador error  {:        if(Jugador.verificarObligatorios(atributosJugador)){
                                                                         Jugador jugador = new Jugador(atributosJugador);
                                                                        RESULT =jugador;
 
                                                                     }else{
                                                                     errorRecuperable=true;
                                                                     RESULT = null;} 
-                                                                    resetearAtributosJugador();:}  ;
+                                                                    resetearAtributosJugador();asj.ayudarConErrores("AtributoJugador");
+                                        errorRecuperable=true;:} 
+
+                        |error {:        if(Jugador.verificarObligatorios(atributosJugador)){
+                                                                        Jugador jugador = new Jugador(atributosJugador);
+                                                                       RESULT =jugador;
+
+                                                                    }else{
+                                                                    errorRecuperable=true;
+                                                                    RESULT = null;} 
+                                                                    resetearAtributosJugador();asj.ayudarConErrores("AtributoJugador");
+                                        errorRecuperable=true;:} ;
+
+
 AtributoJugador ::= NOMBRE DOS_PUNTOS NOMBRE_JUGADOR:nombre  {:if(atributosJugador[0]==null){
                                                         atributosJugador[0]=(String)nombre;
                                                         }else{
