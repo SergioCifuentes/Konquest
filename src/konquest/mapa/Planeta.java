@@ -106,6 +106,10 @@ public class Planeta {
         return produccion;
     }
 
+    public void setpr(int pro){
+        this.produccion=pro;
+    }
+    
     public void setProduccion(Integer produccion) {
         this.produccion = produccion;
         this.produccionOriginal=produccion;

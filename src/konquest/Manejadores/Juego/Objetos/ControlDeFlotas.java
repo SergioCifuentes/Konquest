@@ -194,6 +194,7 @@ public class ControlDeFlotas {
             if (navesRestantes.intValue()==0) {
                 navesRestantes++;
             }
+            
             envio.getDestino().getPlaneta().serConquistado(envio.getOrdenador(), navesRestantes.intValue());
              envio.getOrdenador().agregarPlaneta(envio.getDestino().getPlaneta());
             return new EventoEnvio(EventoEnvio.TIPO_CONQUISTA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino(),envio.getOrdenador());

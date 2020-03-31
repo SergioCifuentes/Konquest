@@ -33,8 +33,17 @@ public class EventoEnvio {
     private Planeta destino;
     private int naves;
     private int ronda;
+    private int produccionAnterior;
     public Planeta getOrigen() {
         return origen;
+    }
+
+    public int getProduccionAnterior() {
+        return produccionAnterior;
+    }
+
+    public void setProduccionAnterior(int produccionAnterior) {
+        this.produccionAnterior = produccionAnterior;
     }
 
     public int getNaves() {

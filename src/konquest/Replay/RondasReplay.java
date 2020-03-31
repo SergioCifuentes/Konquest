@@ -16,6 +16,7 @@ import konquest.Manejadores.Juego.VerificacionFinalizado;
 import konquest.Manejadores.Tablero.DibujadorDeTablero;
 import konquest.Manejadores.Tablero.ManejadorDeCasillas;
 import konquest.contrladoresUI.TextoDeAcciones;
+import konquest.mapa.Jugador;
 import konquest.mapa.Mapa;
 import konquest.ui.Estadisticas;
 import konquest.ui.FramePrincipal;
@@ -82,9 +83,23 @@ public class RondasReplay {
         for (int i = 0; i < enviosPendientes.size(); i++) {
             
             if (enviosPendientes.get(i).getTurnoDestino() == rondaActual.getNumero()) {
+                Jugador aux=enviosPendientes.get(i).getDestino().getPlaneta().getOwner();
+                int pro = enviosPendientes.get(i).getDestino().getPlaneta().getProduccion();
                 EventoEnvio even=ControlDeFlotas.realizarEnvio(enviosPendientes.get(i));
                 even.setEnvioFlota(enviosPendientes.get(i));
-                even.setJugadorAnterior(enviosPendientes.get(i).getDestino().getPlaneta().getOwner());
+                System.out.println("pr "+pro);
+                if (mapa.isAcumular()) {
+                    even.setProduccionAnterior(pro);
+                }else{
+                    even.setProduccionAnterior(pro);
+                }
+                
+                if (aux!=null) {
+                    even.setJugadorAnterior(aux);
+                }else{
+                    even.setJugadorAnterior(null);
+                }
+                
                 eventos.add(even);
                 enviosRealizados.add(enviosPendientes.get(i));
                 in++;
@@ -149,14 +164,14 @@ public class RondasReplay {
     }
     
     public void returnRonda() {
-        
+        System.out.println(enviosRealizados);
         enviosRealizados=ordenarEnviosRealizados(enviosRealizados,true);
         rondas.remove(rondas.size()-1);
         rondaActual = new Ronda(rondaActual.getNumero() - 1);
         int in = 0;
         
-        in=0;
         for (int i = 0; i < enviosRealizados.size(); i++) {
+            System.out.println(enviosRealizados.get(i).getNaves()+"  "+enviosRealizados.get(i).getRonda().getNumero()+enviosRealizados.get(i).getTurnoDestino());
             if (enviosRealizados.get(i).getRonda().getNumero()==rondaActual.getNumero()) {
                 enviosRealizados.get(i).getOrigen().getPlaneta().recibirNavesAleadas(enviosRealizados.get(i).getNaves());
                 EventoEnvio evento=obtenerEventoDeEnvio(enviosRealizados.get(i));
@@ -204,8 +219,18 @@ public class RondasReplay {
                 Double naves1 = evento.getDestino().getNaves()*evento.getDestino().getPorcentajeMuertes();
                naves1=evento.getOrigen().getPorcentajeMuertes()*evento.getNaves()-naves1;
                naves1=naves1/evento.getDestino().getPorcentajeMuertes();
-               evento.getDestino().setNaves(naves1.intValue());
-               evento.getDestino().setOwner(evento.getJugadorAnterior());
+                if (naves1<1) {
+                    naves1=(double)2;
+                }
+               evento.getDestino().setNaves(naves1.intValue()-1);
+                if (evento.getJugadorAnterior()!=null) {
+                    evento.getDestino().setOwner(evento.getJugadorAnterior());
+                    evento.getJugadorAnterior().agregarPlaneta(evento.getDestino());
+                }else{
+                    evento.getDestino().setOwner(null);
+                    evento.getDestino().setNeutral(true);
+                }
+               evento.getDestino().setpr(evento.getProduccionAnterior());
                 break;
             case EventoEnvio.TIPO_DEFENSA:
                Double naves = evento.getDestino().getNaves()*evento.getDestino().getPorcentajeMuertes();

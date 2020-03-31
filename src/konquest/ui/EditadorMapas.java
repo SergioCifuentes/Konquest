@@ -10,6 +10,7 @@ import konquest.contrladoresUI.Render;
 import java.awt.Frame;
 import java.io.File;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -18,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import konquest.Manejadores.Tablero.ControladorDeColores;
 import konquest.Escritores.EscritorDeMapas;
+import konquest.Manejadores.Json.ArchivoDeEntradaJson;
 import konquest.mapa.ConfiguracionNeutrales;
 import konquest.mapa.Jugador;
 import konquest.mapa.Mapa;
@@ -30,14 +32,15 @@ import konquest.mapa.PlanetaNeutral;
  */
 public class EditadorMapas extends javax.swing.JDialog {
 
+    public final static ImageIcon FONDO = new ImageIcon("src/konquest/imagenes/fond2.jpg");
     private Mapa mapa;
     private File file;
-    private Frame fr;
+    private FramePrincipal fr;
 
     /**
      * Creates new form EditadorMapas
      */
-    public EditadorMapas(java.awt.Frame parent, boolean modal, Mapa mapa, File file, Frame fr) {
+    public EditadorMapas(java.awt.Frame parent, boolean modal, Mapa mapa, File file, FramePrincipal fr) {
         super(parent, modal);
         this.mapa = mapa;
         this.file = file;
@@ -45,14 +48,17 @@ public class EditadorMapas extends javax.swing.JDialog {
         ControladorDeColores c = new ControladorDeColores();
         c.generarColores(mapa.getJugadores());
         initComponents();
+        agregarFondo();
         lblNombre.setVisible(false);
         fieldNombre.setVisible(false);
         agregarComponentesDeMapaExistente();
     }
 
-    public EditadorMapas(java.awt.Frame parent, boolean modal, Frame fr) {
+    public EditadorMapas(java.awt.Frame parent, boolean modal, FramePrincipal fr) {
         super(parent, modal);
         initComponents();
+
+        agregarFondo();
         this.fr = fr;
         btnSobrescribir.setVisible(false);
         agregarComponentesDeMapaNuevo();
@@ -121,8 +127,6 @@ public class EditadorMapas extends javax.swing.JDialog {
         setTitle("Editador De Mapas");
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(254, 254, 254));
-
         tbtJugadores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
@@ -180,6 +184,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        lblNombre.setForeground(new java.awt.Color(1, 1, 1));
         lblNombre.setText("Nombre");
 
         fieldNombre.addActionListener(new java.awt.event.ActionListener() {
@@ -228,19 +233,25 @@ public class EditadorMapas extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jLabel1.setBackground(new java.awt.Color(21, 16, 63));
+        jLabel1.setForeground(new java.awt.Color(254, 254, 254));
         jLabel1.setText("Jugador:");
+        jLabel1.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(254, 254, 254), 2, true));
+        jLabel1.setOpaque(true);
 
-        jPanel2.setBackground(new java.awt.Color(254, 254, 254));
         jPanel2.setEnabled(false);
 
+        jLabel5.setForeground(new java.awt.Color(1, 1, 1));
         jLabel5.setText("Columnas:");
 
+        jLabel6.setForeground(new java.awt.Color(1, 1, 1));
         jLabel6.setText("Filas:");
 
         spinColumna.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
 
         spinFila.setModel(new javax.swing.SpinnerNumberModel(1, 1, null, 1));
 
+        ckBoxAzar.setForeground(new java.awt.Color(1, 1, 1));
         ckBoxAzar.setText("Al Azar");
         ckBoxAzar.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -259,8 +270,10 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        jLabel12.setForeground(new java.awt.Color(1, 1, 1));
         jLabel12.setText("Planetas:");
 
+        jLabel7.setForeground(new java.awt.Color(1, 1, 1));
         jLabel7.setText("Dueño:");
 
         comDueño.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "NEUTRAL" }));
@@ -275,6 +288,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        jLabel8.setForeground(new java.awt.Color(1, 1, 1));
         jLabel8.setText("Porcentaje De Muertes:");
 
         spinPorcentaje.setModel(new javax.swing.SpinnerNumberModel(0.0d, 0.0d, null, 0.1d));
@@ -289,6 +303,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        jLabel9.setForeground(new java.awt.Color(1, 1, 1));
         jLabel9.setText("Produccion:");
 
         spinProduccion.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
@@ -298,6 +313,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        jLabel13.setForeground(new java.awt.Color(1, 1, 1));
         jLabel13.setText("Naves Al Comienzo:");
 
         spinNaves.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
@@ -362,12 +378,13 @@ public class EditadorMapas extends javax.swing.JDialog {
                 .addGroup(panelNoAzarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel13)
                     .addComponent(spinNaves, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         spinNeutrales.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
 
         jLabel4.setBackground(javax.swing.UIManager.getDefaults().getColor("MenuItem.selectionBackground"));
+        jLabel4.setForeground(new java.awt.Color(1, 1, 1));
         jLabel4.setText("Planetas Neutrales:");
 
         javax.swing.GroupLayout panelAzarLayout = new javax.swing.GroupLayout(panelAzar);
@@ -397,6 +414,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        jLabel14.setForeground(new java.awt.Color(1, 1, 1));
         jLabel14.setText("Id:");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -418,13 +436,14 @@ public class EditadorMapas extends javax.swing.JDialog {
                                     .addComponent(jLabel14))
                                 .addGap(81, 81, 81)
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(spinColumna)
+                                    .addComponent(spinColumna, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
                                     .addComponent(spinFila)
-                                    .addComponent(fieldId)))))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(panelNoAzar, javax.swing.GroupLayout.PREFERRED_SIZE, 276, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 10, Short.MAX_VALUE)))
+                                    .addComponent(fieldId))))))
                 .addContainerGap())
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(panelNoAzar, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -446,11 +465,12 @@ public class EditadorMapas extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panelAzar, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelNoAzar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(panelNoAzar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
-        jPanel3.setBackground(new java.awt.Color(254, 254, 254));
-
+        ckBoxMapaCiego.setBackground(new java.awt.Color(254, 254, 254));
+        ckBoxMapaCiego.setForeground(new java.awt.Color(1, 1, 1));
         ckBoxMapaCiego.setText("Mapa Ciego");
         ckBoxMapaCiego.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
@@ -458,6 +478,8 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        ckBoxAculativo.setBackground(new java.awt.Color(254, 254, 254));
+        ckBoxAculativo.setForeground(new java.awt.Color(1, 1, 1));
         ckBoxAculativo.setText("Produccion Acumulativa");
         ckBoxAculativo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -465,8 +487,10 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        jLabel10.setForeground(new java.awt.Color(1, 1, 1));
         jLabel10.setText("Neutrales:");
 
+        ckMostrarNaves.setForeground(new java.awt.Color(1, 1, 1));
         ckMostrarNaves.setText("Mostrar Naves");
         ckMostrarNaves.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -474,6 +498,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        ckBosEstadistica.setForeground(new java.awt.Color(1, 1, 1));
         ckBosEstadistica.setText("Mostrar Estadisticas");
         ckBosEstadistica.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -481,6 +506,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             }
         });
 
+        jLabel11.setForeground(new java.awt.Color(1, 1, 1));
         jLabel11.setText("Produccion:");
 
         spinProduccionNeutrales.addChangeListener(new javax.swing.event.ChangeListener() {
@@ -505,7 +531,7 @@ public class EditadorMapas extends javax.swing.JDialog {
                         .addComponent(jLabel11)
                         .addGap(45, 45, 45)
                         .addComponent(spinProduccionNeutrales, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(35, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -553,9 +579,17 @@ public class EditadorMapas extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
+        jLabel2.setBackground(new java.awt.Color(21, 16, 63));
+        jLabel2.setForeground(new java.awt.Color(254, 254, 254));
         jLabel2.setText("Mapa:");
+        jLabel2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(254, 254, 254), 2, true));
+        jLabel2.setOpaque(true);
 
+        jLabel3.setBackground(new java.awt.Color(21, 16, 63));
+        jLabel3.setForeground(new java.awt.Color(254, 254, 254));
         jLabel3.setText("Opciones:");
+        jLabel3.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(254, 254, 254), 2, true));
+        jLabel3.setOpaque(true);
 
         btnNuevo.setText("Nuevo Archivo");
         btnNuevo.addActionListener(new java.awt.event.ActionListener() {
@@ -580,16 +614,17 @@ public class EditadorMapas extends javax.swing.JDialog {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 202, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnSobrescribir)
@@ -717,7 +752,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             System.out.println(mapa.getPlanetas().size() + "nor");
             System.out.println(mapa.getPlanetasNeutrales().size() + "neu");
             if (ckBoxPlanetas.getSelectedIndex() + 1 <= mapa.getPlanetas().size()) {
-               
+
                 for (int i = 0; i < mapa.getJugadores().size(); i++) {
                     if (mapa.getJugadores().get(i) == mapa.getPlanetas().get(ckBoxPlanetas.getSelectedIndex()).getOwner()) {
                         comDueño.setSelectedIndex(i + 1);
@@ -826,6 +861,13 @@ public class EditadorMapas extends javax.swing.JDialog {
         EscritorDeMapas edm = new EscritorDeMapas();
         edm.escribirMapa(mapa, edm.eliminarTextoDeFile(file));
         JOptionPane.showMessageDialog(this, "Guardado Con Exito");
+        JugarDespuesDeEditar jdde = new JugarDespuesDeEditar(fr, true);
+                    jdde.setVisible(true);
+                    if (jdde.isJugar()) {
+                        ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
+                        adej.abrirAchivo(file, fr, true);
+                    }
+                    this.setVisible(false);
     }//GEN-LAST:event_btnSobrescribirActionPerformed
 
     private void btnNuevoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevoActionPerformed
@@ -840,8 +882,16 @@ public class EditadorMapas extends javax.swing.JDialog {
 
                 EscritorDeMapas edm = new EscritorDeMapas();
                 try {
-                    edm.escribirMapa(mapa, edm.crearFile(file, i.getNombre()));
+                    file =edm.crearFile(file, i.getNombre());
+                    edm.escribirMapa(mapa,file );
                     JOptionPane.showMessageDialog(this, "Guardado Con Exito");
+                    JugarDespuesDeEditar jdde = new JugarDespuesDeEditar(fr, true);
+                    jdde.setVisible(true);
+                    if (jdde.isJugar()) {
+                        ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
+                        adej.abrirAchivo(file, fr, true);
+                    }
+                    this.setVisible(false);
                 } catch (Exception e) {
                 }
 
@@ -899,6 +949,16 @@ public class EditadorMapas extends javax.swing.JDialog {
         ckMostrarNaves.setSelected(mapa.getConfiNeutrales().isMostrarNaves());
         spinProduccionNeutrales.setValue(mapa.getConfiNeutrales().getProduccion());
 
+    }
+
+    private void agregarFondo() {
+        JLabel fondo = new JLabel();
+        fondo.setLocation(0, 0);
+        fondo.setBounds(0, 0, 1400, 800);
+        fondo.setIcon(FONDO);
+        this.add(fondo);
+        fondo.setVisible(true);
+        System.out.println(FONDO);
     }
 
     private void agregarJugadores() {
@@ -961,7 +1021,7 @@ public class EditadorMapas extends javax.swing.JDialog {
         atributos3[1] = plane;
         atributos3[2] = Jugador.TIPO_HUMANO;
         ArrayList<Jugador> jugadores = new ArrayList<>();
-        Jugador jug1=new Jugador(atributos3);
+        Jugador jug1 = new Jugador(atributos3);
         jugadores.add(jug1);
 
         atributos3[0] = "\"CPU\"";
@@ -969,47 +1029,45 @@ public class EditadorMapas extends javax.swing.JDialog {
         plane2.add("\"B\"");
         atributos3[1] = plane2;
         atributos3[2] = Jugador.TIPO_DIFICIL;
-        Jugador jug2=new Jugador(atributos3);
+        Jugador jug2 = new Jugador(atributos3);
         jugadores.add(jug2);
 
-        ArrayList<Planeta> planetas= new ArrayList<>();
+        ArrayList<Planeta> planetas = new ArrayList<>();
         Object[] atributosPlaneta = new Object[4];
         atributosPlaneta[0] = "\"A\"";
         atributosPlaneta[1] = 10;
         atributosPlaneta[2] = 5;
         atributosPlaneta[3] = 0.5;
-        Planeta planeta1 =new Planeta(atributosPlaneta);
+        Planeta planeta1 = new Planeta(atributosPlaneta);
         planeta1.setOwner(jug1);
         jug1.agregarPlaneta(planeta1);
         planetas.add(planeta1);
-        
+
         atributosPlaneta[0] = "\"B\"";
         atributosPlaneta[1] = 10;
         atributosPlaneta[2] = 5;
         atributosPlaneta[3] = 0.5;
-        
-        Planeta planeta2 =new Planeta(atributosPlaneta);
+
+        Planeta planeta2 = new Planeta(atributosPlaneta);
         planeta2.setOwner(jug2);
         jug2.agregarPlaneta(planeta2);
         planetas.add(planeta2);
-        
+
         atributosPlaneta[0] = "\"C\"";
         atributosPlaneta[1] = 5;
         atributosPlaneta[2] = 4;
         atributosPlaneta[3] = 0.6;
-        
-        
-        ArrayList<PlanetaNeutral> planetasNeutrals= new ArrayList<>();
+
+        ArrayList<PlanetaNeutral> planetasNeutrals = new ArrayList<>();
         planetasNeutrals.add(new PlanetaNeutral(atributosPlaneta));
-        
+
         mapa = new Mapa(atributos);
         mapa.setJugadores(jugadores);
         mapa.setPlanetas(planetas);
         mapa.setPlanetasNeutrales(planetasNeutrals);
-        ControladorDeColores cdc= new ControladorDeColores();
+        ControladorDeColores cdc = new ControladorDeColores();
         cdc.generarColores(mapa.getJugadores());
         agregarComponentesDeMapaExistente();
-        
 
     }
 
