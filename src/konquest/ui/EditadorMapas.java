@@ -5,6 +5,7 @@
  */
 package konquest.ui;
 
+import java.awt.Dimension;
 import konquest.contrladoresUI.Render;
 import java.awt.Frame;
 import java.io.File;
@@ -17,8 +18,10 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import konquest.Manejadores.Tablero.ControladorDeColores;
 import konquest.Escritores.EscritorDeMapas;
+import konquest.mapa.ConfiguracionNeutrales;
 import konquest.mapa.Jugador;
 import konquest.mapa.Mapa;
+import konquest.mapa.Planeta;
 import konquest.mapa.PlanetaNeutral;
 
 /**
@@ -714,7 +717,7 @@ public class EditadorMapas extends javax.swing.JDialog {
             System.out.println(mapa.getPlanetas().size() + "nor");
             System.out.println(mapa.getPlanetasNeutrales().size() + "neu");
             if (ckBoxPlanetas.getSelectedIndex() + 1 <= mapa.getPlanetas().size()) {
-                System.out.println(mapa.getPlanetas().get(ckBoxPlanetas.getSelectedIndex()).getOwner().getNombre() + "dawdwads");
+               
                 for (int i = 0; i < mapa.getJugadores().size(); i++) {
                     if (mapa.getJugadores().get(i) == mapa.getPlanetas().get(ckBoxPlanetas.getSelectedIndex()).getOwner()) {
                         comDueño.setSelectedIndex(i + 1);
@@ -936,6 +939,77 @@ public class EditadorMapas extends javax.swing.JDialog {
     }
 
     private void agregarComponentesDeMapaNuevo() {
+        Object[] atributos = new Object[8];
+        atributos[0] = "\"Map\"";
+        atributos[1] = new Dimension(15, 10);
+        atributos[2] = false;
+        atributos[3] = null;
+        atributos[4] = false;
+        atributos[5] = true;
+
+        Object[] atributos2 = new Object[3];
+        atributos2[0] = true;
+        atributos2[1] = true;
+        atributos2[2] = 5;
+        atributos[6] = new ConfiguracionNeutrales(atributos2);
+        atributos[7] = null;
+
+        Object[] atributos3 = new Object[3];
+        atributos3[0] = "\"Humano\"";
+        ArrayList<String> plane = new ArrayList<>();
+        plane.add("\"A\"");
+        atributos3[1] = plane;
+        atributos3[2] = Jugador.TIPO_HUMANO;
+        ArrayList<Jugador> jugadores = new ArrayList<>();
+        Jugador jug1=new Jugador(atributos3);
+        jugadores.add(jug1);
+
+        atributos3[0] = "\"CPU\"";
+        ArrayList<String> plane2 = new ArrayList<>();
+        plane2.add("\"B\"");
+        atributos3[1] = plane2;
+        atributos3[2] = Jugador.TIPO_DIFICIL;
+        Jugador jug2=new Jugador(atributos3);
+        jugadores.add(jug2);
+
+        ArrayList<Planeta> planetas= new ArrayList<>();
+        Object[] atributosPlaneta = new Object[4];
+        atributosPlaneta[0] = "\"A\"";
+        atributosPlaneta[1] = 10;
+        atributosPlaneta[2] = 5;
+        atributosPlaneta[3] = 0.5;
+        Planeta planeta1 =new Planeta(atributosPlaneta);
+        planeta1.setOwner(jug1);
+        jug1.agregarPlaneta(planeta1);
+        planetas.add(planeta1);
+        
+        atributosPlaneta[0] = "\"B\"";
+        atributosPlaneta[1] = 10;
+        atributosPlaneta[2] = 5;
+        atributosPlaneta[3] = 0.5;
+        
+        Planeta planeta2 =new Planeta(atributosPlaneta);
+        planeta2.setOwner(jug2);
+        jug2.agregarPlaneta(planeta2);
+        planetas.add(planeta2);
+        
+        atributosPlaneta[0] = "\"C\"";
+        atributosPlaneta[1] = 5;
+        atributosPlaneta[2] = 4;
+        atributosPlaneta[3] = 0.6;
+        
+        
+        ArrayList<PlanetaNeutral> planetasNeutrals= new ArrayList<>();
+        planetasNeutrals.add(new PlanetaNeutral(atributosPlaneta));
+        
+        mapa = new Mapa(atributos);
+        mapa.setJugadores(jugadores);
+        mapa.setPlanetas(planetas);
+        mapa.setPlanetasNeutrales(planetasNeutrals);
+        ControladorDeColores cdc= new ControladorDeColores();
+        cdc.generarColores(mapa.getJugadores());
+        agregarComponentesDeMapaExistente();
+        
 
     }
 

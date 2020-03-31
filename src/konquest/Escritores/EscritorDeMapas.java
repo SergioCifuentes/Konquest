@@ -39,8 +39,11 @@ public class EscritorDeMapas {
         textoAEscribir += "\n\t\t\tmostrarNaves:"+mapa.getConfiNeutrales().isMostrarNaves()+",";
         textoAEscribir += "\n\t\t\tmostrarEstadisticas:"+mapa.getConfiNeutrales().isMostrarEstadisticas()+",";
         textoAEscribir += "\n\t\t\tproduccion:"+mapa.getConfiNeutrales().getProduccion();
-        textoAEscribir += "\n\t\t},";
-        textoAEscribir += "\n\t\tfinalizacion:" + mapa.getFinalizado();
+        textoAEscribir += "\n\t\t}";
+        if (mapa.getFinalizado()!=null) {
+            textoAEscribir += ",\n\t\tfinalizacion:" + mapa.getFinalizado();
+        }
+        
         textoAEscribir += "\n\t},";
         textoAEscribir += "\n\tPLANETAS: [";
         if (!mapa.isAlAzar()) {
@@ -68,7 +71,7 @@ public class EscritorDeMapas {
                 textoAEscribir  += "\n\t\t\tproduccion: "+mapa.getPlanetasNeutrales().get(i).getProduccion()+",";
                 textoAEscribir  += "\n\t\t\tporcentajeMuertes: "+mapa.getPlanetasNeutrales().get(i).getPorcentajeMuertes();
                 textoAEscribir  += "\n\t\t}";
-                if (i<mapa.getPlanetas().size()-1) {
+                if (i<mapa.getPlanetasNeutrales().size()-1) {
                     textoAEscribir+=",";
                 }
             }

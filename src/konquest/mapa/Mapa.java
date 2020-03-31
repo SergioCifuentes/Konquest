@@ -61,6 +61,18 @@ public class Mapa {
         return jugadores;
     }
 
+    public void setJugadores(ArrayList<Jugador> jugadores) {
+        this.jugadores = jugadores;
+    }
+
+    public void setPlanetas(ArrayList<Planeta> planetas) {
+        this.planetas = planetas;
+    }
+
+    public void setPlanetasNeutrales(ArrayList<PlanetaNeutral> planetasNeutrales) {
+        this.planetasNeutrales = planetasNeutrales;
+    }
+
     public ArrayList<Planeta> getPlanetas() {
         return planetas;
     }
