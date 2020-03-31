@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -65,6 +66,41 @@ public class ArchivoDeEntradaJson {
         } else {
             JOptionPane.showMessageDialog(frame, "El Archivo Debe Ser '.Json'", "Error Al Cargar", JOptionPane.ERROR_MESSAGE);
         }
+
+    }
+    
+        public void abrirtexto(String text, FramePrincipal frame) {
+        
+            try {
+                frame.agregarTextoAcciones("====Empezando Analisis==================================\n");
+                AnalizadorLexicoJson alj = new AnalizadorLexicoJson(new StringReader(text));
+                AnalizadorSintacticoJson asj = new AnalizadorSintacticoJson(alj);
+                asj.setFrame(frame);
+                asj.parse();
+                if (asj.error) {
+                    error=true;
+                    frame.agregarTextoAcciones("Arregle Los ERRORES Para Poder Abrir El Mapa\n");
+                } else {
+                    if (asj.errorRecuperable) {
+                        frame.agregarTextoAcciones("Mapa Cargada con ERRORES\n");
+                    }else{
+                        frame.agregarTextoAcciones("Mapa Cargada con Exito\n");
+                    }
+                    this.mapa = asj.getMapa();
+                    
+                    
+                    
+                }
+                frame.agregarTextoAcciones("=====================================================\n");
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+       
 
     }
 

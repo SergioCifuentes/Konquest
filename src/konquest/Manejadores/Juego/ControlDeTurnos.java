@@ -13,6 +13,9 @@ import konquest.Manejadores.Juego.Objetos.EventoEnvio;
 import konquest.Manejadores.Tablero.DibujadorDeTablero;
 import konquest.Manejadores.Tablero.Distancias;
 import konquest.Manejadores.Tablero.ManejadorDeCasillas;
+import konquest.Online.EnviosOnline;
+import konquest.Online.Guest;
+import konquest.Online.Host;
 import konquest.mapa.Jugador;
 import konquest.mapa.Mapa;
 import konquest.ui.Estadisticas;
@@ -31,6 +34,7 @@ public class ControlDeTurnos {
     private FramePrincipal fp;
     private ArrayList<EnvioDeFlota> flotasDeTurno;
     private ControlDeFlotas cdf;
+    private boolean mensajeRecibido = false;
 
     public Jugador getJugadorEnTurnoActual() {
         return jugadorEnTurnoActual;
@@ -60,8 +64,131 @@ public class ControlDeTurnos {
         mandarInfoAFram();
     }
 
+    private Host host;
+    private Guest guest;
+
+    public ControlDeTurnos(Mapa mapa, ControladorDeRondas cdr, FramePrincipal fp, Host host, Guest guest) {
+        this.cdr = cdr;
+        this.fp = fp;
+        this.mapa = mapa;
+        this.host = host;
+        this.guest = guest;
+        cdf = new ControlDeFlotas();
+        flotasDeTurno = new ArrayList<>();
+        this.jugadoresEnOrden = mapa.getJugadores();
+
+        if (host != null) {
+            jugadorEnTurnoActual = host.getJugador();
+        } else if (guest != null) {
+            jugadorEnTurnoActual = guest.getJugador();
+        }
+
+    }
+
+    public void empezarOnline() {
+        flotasDeTurno = new ArrayList<>();
+        empezarTurnos();
+        mandarInfoAFram();
+    }
+
+    public void terminarTurnoOnline() {
+        ArrayList<EnvioDeFlota> flotasAMandar = new ArrayList<>();
+        if (!(flotasDeTurno == null) && !(flotasDeTurno.isEmpty())) {
+            cdf.GuardarEnvioPorTurno(flotasDeTurno);
+            flotasAMandar = flotasDeTurno;
+        }
+
+        flotasDeTurno = new ArrayList<>();
+        if (host != null) {
+            for (int i = 0; i < jugadoresEnOrden.size(); i++) {
+                if (jugadoresEnOrden.get(i).getTipo() != Jugador.TIPO_HUMANO) {
+                    ManejadorEnemigoPC mepc = new ManejadorEnemigoPC(mapa, jugadoresEnOrden.get(i));
+                    ArrayList<EnvioDeFlota> flotasAux = mepc.realizarAtaques();
+                    if (!(flotasAux == null) && !(flotasAux.isEmpty())) {
+                        cdf.GuardarEnvioPorTurno(flotasAux);
+                        for (int j = 0; j < flotasAux.size(); j++) {
+                            flotasAMandar.add(flotasAux.get(j));
+                        }
+                    }
+                }
+            }
+        }
+        mandarFlotasOnline(flotasAMandar);
+        if (mensajeRecibido) {
+            cdr.terminarRonda(cdf, this);
+            if (!fp.isGanador()) {
+                if (host!=null) {
+                    jugadorEnTurnoActual = host.getJugador();
+                }else{
+                    jugadorEnTurnoActual= guest.getJugador();
+                }
+                    empezarTurnos();
+                }
+            esperando=false;
+            mensajeRecibido=false;
+        } else {
+            esperarOponenteOnline();
+        }
+
+    }
+    
+    private boolean esperando = false;
+
+    
+    public void mandarFlotasOnline(ArrayList<EnvioDeFlota> envios){
+        String text = EnviosOnline.pasarEnvioAOnline(envios);
+        if (host!=null) {
+            host.getObservableHost().mandarTexto(text);
+        }else{
+            guest.getObservableGuess().mandarTexto(text);
+        }
+        
+    }
+    public boolean isEsperando() {
+        return esperando;
+    }
+
+    public void esperarOponenteOnline() {
+        esperando = true;
+        fp.esperarTurnoRival();
+    }
+    
+    public void recibirEnviosOnline(ArrayList<EnvioDeFlota> envios){
+        System.out.println("Recibidooooooo "+envios);
+        if (!(envios == null) && !(envios.isEmpty())) {
+            cdf.GuardarEnvioPorTurno(envios);
+            for (int i = 0; i < envios.size(); i++) {
+                envios.get(i).getOrigen().getPlaneta().restarNaves(envios.get(i).getNaves());
+            }
+        }
+        if (esperando) {
+            cdr.terminarRonda(cdf, this);
+            if (!fp.isGanador()) {
+                if (host!=null) {
+                    jugadorEnTurnoActual = host.getJugador();
+                }else{
+                    jugadorEnTurnoActual= guest.getJugador();
+                }
+                    
+                    empezarTurnos();
+                    
+                }
+            esperando=false;
+            mensajeRecibido=false;
+        }else{
+            mensajeRecibido =true;
+        }
+        
+        
+        
+    }
+
+    public void setGuest(Guest guest) {
+        this.guest = guest;
+        jugadorEnTurnoActual = guest.getJugador();
+    }
+
     public void terminarTurno(ArrayList<EnvioDeFlota> flotas) {
-        System.out.println(flotas);
         if (!(flotas == null) && !(flotas.isEmpty())) {
             cdf.GuardarEnvioPorTurno(flotas);
         }
@@ -83,6 +210,10 @@ public class ControlDeTurnos {
                 }
             }
         }
+    }
+
+    public void empezarTurnosOnline() {
+
     }
 
     public void empezarTurnos() {
@@ -113,11 +244,11 @@ public class ControlDeTurnos {
         terminarTurno(flotasDeTurno);
     }
 
-    public void mostrarEstadistics(){
-        Estadisticas estadisticas= new Estadisticas(fp, true, jugadoresEnOrden, cdf.getEnviosEnProceso(),cdf.getEnviosRealizados());
+    public void mostrarEstadistics() {
+        Estadisticas estadisticas = new Estadisticas(fp, true, jugadoresEnOrden, cdf.getEnviosEnProceso(), cdf.getEnviosRealizados());
         estadisticas.setVisible(true);
     }
-    
+
     public void terminarEnvio() {
         EnvioDeFlota edf = new EnvioDeFlota(fp.getPrimerCasilla(), fp.getSegundaCasilla(),
                 jugadorEnTurnoActual, fp.getNaves(), cdr.getRondaActual(),

@@ -53,7 +53,8 @@ public class ComponenteReplay {
     public void setEnvios(ArrayList<EnvioReplay> envios) {
         this.envios = envios;
     }
-
+    
+    
     public static boolean verificarReplay(Mapa mapa, ComponenteReplay componenteReplay, FramePrincipal fp) {
 
         for (int i = 0; i < componenteReplay.getPartidas().size() - 1; i++) {

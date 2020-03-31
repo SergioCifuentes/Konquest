@@ -194,8 +194,8 @@ Rondas		::= ENTERO:num DOS_PUNTOS CORCHETE_A Envios:enviosAn CORCHETE_C COMA Ron
                                                                     for(int i=0;i<((ArrayList<EnvioReplay>)enviosAn).size();i++){
                                                                         ((ArrayList<EnvioReplay>)enviosAn).get(i).setRonda(Integer.valueOf((String)num));
                                                                          }replay.agregarEnvios(((ArrayList<EnvioReplay>)enviosAn));
-                                                                            }if(Integer.valueOf((String)num)>rondaMayor){rondaMayor=Integer.valueOf((String)num);}:};
-
+                                                                            }if(Integer.valueOf((String)num)>rondaMayor){rondaMayor=Integer.valueOf((String)num);}:}
+                                         |;                                  
 Envios		::= LLAVE_A Envio:envio LLAVE_C COMA Envios:enviosAn       {: ArrayList<EnvioReplay> envios= new ArrayList<>();
                                                                                 if(envio!=null){
                                                                         envios.add((EnvioReplay) envio);

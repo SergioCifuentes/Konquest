@@ -1,0 +1,53 @@
+package konquest.cup.Online;
+import java_cup.runtime.Symbol;
+import java.util.ArrayList;
+import konquest.Replay.Objetos.EnvioReplay;
+ parser code {:
+    private ArrayList<EnvioReplay> enviosReplay;
+    
+    public void setEnvios(ArrayList<EnvioReplay> en){
+        this.enviosReplay =en;
+    }
+public ArrayList<EnvioReplay> getEnvios(){
+    return enviosReplay;
+}
+:}
+
+
+
+action code {:
+private Object[] atributosRonda = new Object[3];
+private ArrayList<EnvioReplay> envios=new ArrayList<>();
+private void resetearAtributosRondas(){
+        for(int i=0;i<atributosRonda.length;i++){
+            atributosRonda[i]=null;
+        }
+    }
+
+:}
+
+
+
+
+
+terminal ORIGEN , DESTINO,NAVES,LLAVE_A,LLAVE_C,DOS_PUNTOS,COMA,ENTERO;
+terminal String ID_NOMBRE,ERROR;
+
+non terminal    Inicio , Envios, Envio, AtributoEnvio;
+
+start with Inicio;
+
+Inicio 			::= LLAVE_A Envios LLAVE_C  {:aso.setEnvios(envios);:}
+                            | LLAVE_A LLAVE_C;
+
+Envios 			::= LLAVE_A Envio:env LLAVE_C COMA Envios   {:envios.add((EnvioReplay)env);:}
+					| LLAVE_A Envio:env LLAVE_C    {:envios.add((EnvioReplay)env);:};
+
+Envio			::=AtributoEnvio COMA Envio:re {:RESULT =re;:}
+					| AtributoEnvio {:EnvioReplay pi=new EnvioReplay(atributosRonda);
+                                                            resetearAtributosRondas();
+                                                             RESULT =pi;:};
+
+AtributoEnvio	 ::= ORIGEN DOS_PUNTOS ID_NOMBRE:nombre     {:atributosRonda[0]=(String)nombre;:}
+                    |DESTINO DOS_PUNTOS ID_NOMBRE:nombre   {:atributosRonda[1]=(String)nombre;:}
+                    | NAVES DOS_PUNTOS ENTERO:numero       {:atributosRonda[2]=Integer.valueOf((String)numero);:};

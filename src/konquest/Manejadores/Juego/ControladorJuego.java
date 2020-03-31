@@ -43,7 +43,7 @@ public class ControladorJuego {
     }
     
     
-    public void iniciarPosiciones(Mapa mapa){
+    public static void iniciarPosiciones(Mapa mapa){
         ArrayList<Planeta> planetasAux=new ArrayList<>();
         for (int i = 0; i < mapa.getPlanetas().size(); i++) {
             planetasAux.add(mapa.getPlanetas().get(i));

@@ -1,0 +1,20 @@
+N: Inicio, Envios, Envio, AtributoEnvio, Id_Nombre, Entero, Digito
+T:	{ ,}, , , ", [0-9], origen,destino,naves
+S:  {Inicio}
+
+
+Inicio 			::= {Envios}
+Envios 			::= {Envio} , Envios
+					| {Envio}
+Envio			::=AtributoEnvio , Envio
+					| AtributoEnvio
+AtributoEnvio	 ::= origen : Id_Nombre
+					|destino : Id_Nombre
+					| naves : Entero
+
+Id_Nombre		::=	Letra (Letra|"")^2
+Entero			::=Digito Entero
+					|Digito
+Digito			::= [0-9]
+
+

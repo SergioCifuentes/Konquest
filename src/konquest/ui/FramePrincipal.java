@@ -22,6 +22,8 @@ import konquest.Manejadores.Juego.Objetos.EnvioDeFlota;
 import konquest.Manejadores.Juego.Objetos.Ronda;
 import konquest.Replay.ManejadorDeEntrada;
 import konquest.Replay.RondasReplay;
+import konquest.Sockets.ManejadorDeMensajes;
+import konquest.Sockets.verificacionesOnline;
 import konquest.contrladoresUI.TextoDeAcciones;
 import konquest.mapa.Casilla;
 import konquest.mapa.Jugador;
@@ -45,6 +47,8 @@ public class FramePrincipal extends javax.swing.JFrame {
     private JPanel pane;
     private boolean replay;
     private boolean ganador;
+    private boolean online;
+    
 
     /**
      * Creates new form FramePrincipal
@@ -102,7 +106,9 @@ public class FramePrincipal extends javax.swing.JFrame {
         menuItemOpen = new javax.swing.JMenuItem();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
-        menuItemOnline = new javax.swing.JMenuItem();
+        jMenu6 = new javax.swing.JMenu();
+        itemHost = new javax.swing.JMenuItem();
+        itemGuest = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         memuItemNew = new javax.swing.JMenuItem();
         menuItemEdit = new javax.swing.JMenuItem();
@@ -316,8 +322,25 @@ public class FramePrincipal extends javax.swing.JFrame {
         });
         menuOpen.add(jMenuItem2);
 
-        menuItemOnline.setText("Online");
-        menuOpen.add(menuItemOnline);
+        jMenu6.setText("Online");
+
+        itemHost.setText("Host");
+        itemHost.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemHostActionPerformed(evt);
+            }
+        });
+        jMenu6.add(itemHost);
+
+        itemGuest.setText("Guest");
+        itemGuest.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemGuestActionPerformed(evt);
+            }
+        });
+        jMenu6.add(itemGuest);
+
+        menuOpen.add(jMenu6);
 
         menu.add(menuOpen);
 
@@ -434,7 +457,12 @@ public class FramePrincipal extends javax.swing.JFrame {
         if (btnEnvio.getText().equals(TEXTO_ENVIAR)) {
             enviar();
         } else {
-            cdt.finalizarTurno();
+            if (online) {
+                cdt.terminarTurnoOnline();
+            }else{
+                cdt.finalizarTurno();
+            }
+            
         }
     }//GEN-LAST:event_btnEnvioActionPerformed
 
@@ -442,6 +470,14 @@ public class FramePrincipal extends javax.swing.JFrame {
         FlotasPendientes flota = new FlotasPendientes(this, calcularDistancia, cdt);
         flota.setVisible(true);
     }//GEN-LAST:event_btnFlotasActionPerformed
+
+    public boolean isOnline() {
+        return online;
+    }
+
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
 
     private void menuItemEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemEditActionPerformed
         JFileChooser jfc = new JFileChooser();
@@ -550,6 +586,36 @@ public class FramePrincipal extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_itemGuardarActionPerformed
+
+    private void itemHostActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemHostActionPerformed
+        JFileChooser jfc = new JFileChooser();
+        jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        jfc.showOpenDialog(this);
+        file = jfc.getSelectedFile();
+        if (file != null) {
+            removerTextoAcciones();
+            panel.removeAll();
+            ArchivoDeEntradaJson adej = new ArchivoDeEntradaJson();
+            adej.abrirAchivo(file, this, false);
+            verificacionesOnline vOnline= new verificacionesOnline();
+            
+            if (vOnline.verificarJugadores(this,adej.getMapa())) {
+                lblInstruccion.setText("Esperando Rival...");
+                PedirJugador pj = new PedirJugador(this,true,adej.getMapa().getJugadores());
+                pj.setVisible(true);
+                
+                ManejadorDeMensajes mdm= new ManejadorDeMensajes();
+                mdm.iniciarJuegoHost(adej.getMapa(), this,file);
+                
+            }
+        }
+        
+    }//GEN-LAST:event_itemHostActionPerformed
+
+    private void itemGuestActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemGuestActionPerformed
+        ManejadorDeMensajes mdm= new ManejadorDeMensajes();
+        mdm.iniciarJuegoCliente(this);
+    }//GEN-LAST:event_itemGuestActionPerformed
     private void enviar() {
         if (numeroTopas.getText() != null) {
             try {
@@ -597,13 +663,22 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     }
 
+    public ControlDeTurnos getCdt() {
+        return cdt;
+    }
+
     public boolean isGanador() {
+        btnEnvio.setEnabled(true);
         itemGuardar.setEnabled(false);
         return ganador;
     }
 
-    public void agregarTextoAcciones(String texto) {
-
+    public void esperarTurnoRival(){
+        btnEnvio.setEnabled(true);
+        lblInstruccion.setText("Esperando Turno Rival ...");
+    }
+    
+    public void  agregarTextoAcciones(String texto) {
         TextoDeAcciones.appendToPane(paneAcciones, texto, Color.WHITE);
     }
 
@@ -743,6 +818,8 @@ public class FramePrincipal extends javax.swing.JFrame {
     private javax.swing.JButton btnRegresar;
     private javax.swing.JButton btnSiguiente;
     private javax.swing.JMenuItem itemGuardar;
+    private javax.swing.JMenuItem itemGuest;
+    private javax.swing.JMenuItem itemHost;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -755,6 +832,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenu jMenu5;
+    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -767,7 +845,6 @@ public class FramePrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem memuItemNew;
     private javax.swing.JMenuBar menu;
     private javax.swing.JMenuItem menuItemEdit;
-    private javax.swing.JMenuItem menuItemOnline;
     private javax.swing.JMenuItem menuItemOpen;
     private javax.swing.JMenu menuOpen;
     private javax.swing.JPasswordField numeroTopas;

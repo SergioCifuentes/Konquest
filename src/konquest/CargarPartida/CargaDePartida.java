@@ -34,13 +34,20 @@ public class CargaDePartida {
 
     private Mapa mapa;
 
-    public void empezarCarga(Mapa mapa, ComponenteReplay componentes, FramePrincipal fp, int ronda) {
+    public void empezarCarga(Mapa mapa, ComponenteReplay componentes, FramePrincipal fp, int ronda,boolean online) {
         this.mapa = mapa;
         ManejadorDeCasillas mc = new ManejadorDeCasillas();
         ControladorDeColores cdc = new ControladorDeColores();
         cdc.generarColores(mapa.getJugadores());
+        
         ControladorDeRondas cdr = new ControladorDeRondas();
-        ControlDeTurnos cdt = new ControlDeTurnos(mapa, cdr, fp);
+        ControlDeTurnos cdt=null;
+        if (online) {
+            cdt= new ControlDeTurnos(mapa, cdr, fp, null, null);
+        }else{
+         cdt= new ControlDeTurnos(mapa, cdr, fp);   
+        }
+         
         fp.setCdt(cdt);
         fp.setReplay(false);
         EleccionDePlaneta edp = new EleccionDePlaneta(fp, cdt);
@@ -61,6 +68,7 @@ public class CargaDePartida {
             mapa.getPlanetasNeutrales().remove(0);
         }
         for (int i = 0; i < componentes.getPartidas().size(); i++) {
+            componentes.getPartidas().get(i).restar();
             Planeta planeta;
             if (componentes.getPartidas().get(i).getNombreJugador().equals(PartidaInicial.NEUTRAL)) {
                 planeta = crearPlanetaNeutral(componentes.getPartidas().get(i));
@@ -70,7 +78,7 @@ public class CargaDePartida {
                 planeta.setPi(componentes.getPartidas().get(i));
                 getJugador(componentes.getPartidas().get(i).getNombreJugador()).agregarPlaneta(planeta);
             }
-            mapa.getCasillas()[componentes.getPartidas().get(i).getColumna() - 1][componentes.getPartidas().get(i).getFila() - 1].setPlaneta(planeta, mapa);
+            mapa.getCasillas()[componentes.getPartidas().get(i).getColumna()][componentes.getPartidas().get(i).getFila()].setPlaneta(planeta, mapa);
 
         }
         agregarNavesProducidasIniciales(mapa.getJugadores());
@@ -81,7 +89,10 @@ public class CargaDePartida {
             cdr.terminarRonda(cdt.getCdf(), cdt);
             
         }
-        cdt.empezarTurnos();
+        if (!online) {
+           cdt.empezarTurnos();
+        }
+        
         DibujadorDeTablero ddt = new DibujadorDeTablero();
         ddt.dibujarTablero(mapa, fp.getJPanel());
         

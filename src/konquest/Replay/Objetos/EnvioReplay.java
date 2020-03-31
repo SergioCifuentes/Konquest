@@ -32,6 +32,7 @@ public class EnvioReplay {
     }
 
     public EnvioReplay(Object[] atributos){
+        System.out.println(atributos+"777777777777777");
         origen=((String)atributos[0]).substring(1,((String)atributos[0]).length()-1);
         destino=((String)atributos[1]).substring(1,((String)atributos[1]).length()-1);
         naves=(Integer)atributos[2];

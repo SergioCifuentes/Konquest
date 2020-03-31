@@ -39,7 +39,10 @@ public class PartidaInicial {
         
     }
     
-    
+    public void restar(){
+        fila--;
+        columna--;
+    }
     public static boolean verificarObligatorios(Object[] atributos,FramePrincipal fp){
         boolean faltante=true;
         for (int i = 0; i < 7; i++) {

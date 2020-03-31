@@ -202,7 +202,7 @@ public class Casilla extends JPanel {
     }
 
     private void PanelMouseClicked(java.awt.event.MouseEvent evt) {
-        if (planeta != null&&!cdt.getFramePrincipal().isGanador()) {
+        if (planeta != null&&!cdt.getFramePrincipal().isGanador()&&!cdt.isEsperando()) {
             edp.obtenerEleccionPlaneta(this);
         }
 
@@ -213,6 +213,7 @@ public class Casilla extends JPanel {
         this.setBackground(ControladorDeColores.obtenerColorAlSeleccionar(this.getBackground()));
         if (cdt != null && edp != null) {
             if (getPlaneta().getOwner() != null) {
+                
                 if (cdt.getJugadorEnTurnoActual().equals(this.planeta.getOwner())) {
                     this.setToolTipText("<html>Planeta: " + getPlaneta().getNombre() + "<br>"
                             + "Dueño: " + getPlaneta().getOwner().getNombre() + "<br>"

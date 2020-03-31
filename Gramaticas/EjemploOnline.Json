@@ -1,0 +1,13 @@
+{
+	{
+		origen: "A",
+		destino:"B",
+		naves: 10
+	},
+	{
+		origen: "A",
+		destino:"C",
+		naves: 2
+	}
+
+}

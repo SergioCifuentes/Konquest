@@ -20,11 +20,11 @@ import konquest.mapa.Planeta;
  */
 public class ManejadorDeCasillas {
 
-    public Casilla[][] generarCasillas(int columnas, int filas,ControlDeTurnos cdr,EleccionDePlaneta edp) {
+    public Casilla[][] generarCasillas(int columnas, int filas,ControlDeTurnos cdt,EleccionDePlaneta edp) {
         Casilla[][] casillas = new Casilla[columnas][filas];
         for (int i = 0; i < columnas; i++) {
             for (int j = 0; j < filas; j++) {
-                casillas[i][j] = new Casilla(cdr,edp);
+                casillas[i][j] = new Casilla(cdt,edp);
                 casillas[i][j].setColumna(i);
                 casillas[i][j].setFila(j);
                 casillas[i][j].setBounds(i * Casilla.ANCHO, j * Casilla.ALTO, Casilla.ANCHO, Casilla.ALTO);

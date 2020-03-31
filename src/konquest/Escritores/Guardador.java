@@ -21,7 +21,21 @@ import konquest.mapa.Planeta;
 public class Guardador {
 
     public void crearArchivo(File file, ArrayList<Planeta> planetas, ArrayList<EnvioDeFlota> envios, int rondaFinal) {
-        String textoAEscribir = "";
+        String textoAEscribir = obtenerTexto(planetas, envios, rondaFinal);
+        
+
+        try {
+
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+                bw.write(textoAEscribir);
+            }
+        } catch (IOException ex) {
+            System.out.println("error AL escribir Mapa");
+        }
+    }
+    
+    public static String obtenerTexto( ArrayList<Planeta> planetas, ArrayList<EnvioDeFlota> envios, int rondaFinal){
+        String textoAEscribir="";
         textoAEscribir += "{\n\tterminado: false,";
         textoAEscribir += escribirPlanetasIniciales(planetas);
 
@@ -50,8 +64,11 @@ public class Guardador {
                 textoAEscribir += "\n\t\t" + ronda + ": [";
                 i--;
             }
+            if (i==envios.size()-1) {
+                textoAEscribir += "\n\t\t]";
+            }
         }
-        textoAEscribir += "\n\t\t]";
+        
         if (ronda < rondaFinal) {
             textoAEscribir += ",";
             textoAEscribir += "\n\t\t" + rondaFinal + ": [";
@@ -60,14 +77,6 @@ public class Guardador {
         
         textoAEscribir += "\n\t}";
         textoAEscribir += "\n}";
-
-        try {
-
-            try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
-                bw.write(textoAEscribir);
-            }
-        } catch (IOException ex) {
-            System.out.println("error AL escribir Mapa");
-        }
+        return textoAEscribir;
     }
 }

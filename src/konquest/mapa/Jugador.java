@@ -24,6 +24,8 @@ public class Jugador {
     private boolean vivo;
     private EstadisticasJugador estadisticas;
 
+    private boolean host;
+    
     public boolean isVivo() {
         return vivo;
     }
@@ -41,6 +43,14 @@ public class Jugador {
 
     public Color getColor() {
         return color;
+    }
+
+    public boolean isHost() {
+        return host;
+    }
+
+    public void setHost(boolean host) {
+        this.host = host;
     }
 
     public void setTipo(int tipo){

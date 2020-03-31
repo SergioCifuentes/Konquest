@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -87,7 +88,7 @@ public class ManejadorDeEntrada {
                          if (ComponenteReplay.verificarReplay(mapa, co,frame)) {
                                 frame.agregarTextoAcciones("Enlace Exitoso\n");
                                 CargaDePartida cargaDePartida = new CargaDePartida();
-                                cargaDePartida.empezarCarga(mapa,co, frame,asr.getRondaMayor());
+                                cargaDePartida.empezarCarga(mapa,co, frame,asr.getRondaMayor(),false);
                             }else{
                              frame.agregarTextoAcciones("Enlace No Correcto\n");
                          }
@@ -109,6 +110,97 @@ public class ManejadorDeEntrada {
             JOptionPane.showMessageDialog(frame, "El Archivo Debe Ser '.Json'", "Error Al Cargar", JOptionPane.ERROR_MESSAGE);
         }
 
+    }
+    private Mapa mapa;
+
+    public Mapa getMapa() {
+        return mapa;
+    }
+    private ComponenteReplay co;
+
+    public ComponenteReplay getCo() {
+        return co;
+    }
+    
+    
+    public void abrirTexto(String texto, FramePrincipal frame,Mapa mapa,boolean replay) {
+        
+            try {
+                
+                if (replay) {
+                    frame.agregarTextoAcciones("====Empezando Analisis Replay==================================\n");
+                }else{
+                    frame.agregarTextoAcciones("====Empezando Carga De Partida==================================\n");
+                }
+                
+                AnalizadorLexicoReplays alr= new AnalizadorLexicoReplays(new StringReader(texto));
+                AnalizadorSintacticoReplay asr = new AnalizadorSintacticoReplay(alr);
+                asr.setFrame(frame);
+                asr.parse();
+                if (asr.error) {
+                    if (replay) {
+                        frame.agregarTextoAcciones("Arregle Los ERRORES Para Poder Abrir El Replay\n");
+                    }else{
+                        frame.agregarTextoAcciones("Arregle Los ERRORES Para Poder Abrir la Partida Guardad\n");
+                    }
+                    
+                } else {
+                    if (asr.errorRecuperable) {
+                        if (replay) {
+                            frame.agregarTextoAcciones("Replay Cargada con ERRORES\n");
+                        }else{
+                            frame.agregarTextoAcciones("Partida Cargada con ERRORES\n");
+                        }
+                        
+                    }else{
+                        if (replay) {
+                            frame.agregarTextoAcciones("Replay Cargada con Exito\n");
+                        }else{
+                            frame.agregarTextoAcciones("Partida Cargada con Exito\n");
+                        }
+                        
+                    }
+                    ComponenteReplay co = asr.getReplay();
+                    //REPLAY
+                    if (replay) {
+                        if (co.isTerminado()) {
+                            if (ComponenteReplay.verificarReplay(mapa, co,frame)) {
+                                frame.agregarTextoAcciones("Enlace Exitoso\n");
+                                ControladorReplay cr= new ControladorReplay();
+                                cr.empezarReplay(mapa, co, frame);
+                            }else{
+                                 frame.agregarTextoAcciones("Enlace No Correcto\n");
+                            }
+                    }else{
+                         JOptionPane.showMessageDialog(frame,"Esta Partida no ha termindo","Partida en Proeceso",JOptionPane.ERROR_MESSAGE);
+                     }
+                        //CARGADEPARTIDA
+                    }else{
+                        if (co.isTerminado()) {
+                            JOptionPane.showMessageDialog(frame,"Esta Partida ya ha termindo","Partida Terminado",JOptionPane.ERROR_MESSAGE);
+                    }else{
+                         if (ComponenteReplay.verificarReplay(mapa, co,frame)) {
+                                frame.agregarTextoAcciones("Enlace Exitoso\n");
+                                CargaDePartida cargaDePartida = new CargaDePartida();
+                                cargaDePartida.empezarCarga(mapa,co, frame,asr.getRondaMayor(),true);
+                            }else{
+                             frame.agregarTextoAcciones("Enlace No Correcto\n");
+                         }
+                     }
+                    }
+                     
+                    
+                }
+                frame.agregarTextoAcciones("=====================================================");
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
+                Logger.getLogger(ArchivoDeEntradaJson.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+      
     }
     
 }
