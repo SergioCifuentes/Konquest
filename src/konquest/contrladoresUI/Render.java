@@ -22,6 +22,9 @@ public class Render extends DefaultTableCellRenderer{
         if (value instanceof JLabel) {
             JLabel label =(JLabel)value;
             return label;
+        }else if(value instanceof JButton){
+            JButton label =(JButton)value;
+            return label;
         }
         
         return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column); //To change body of generated methods, choose Tools | Templates.

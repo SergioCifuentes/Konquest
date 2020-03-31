@@ -61,13 +61,14 @@ public class ControlDeFlotas {
     }
 
     public void realizarEnviosDeRonda(ControlDeTurnos cdt) {
+        
         ordenarEnvios();
         if (cdt.getCdr().getRondaActual().getNumero() == 2) {
             cdt.getFramePrincipal().removerTextoAcciones();
         }
         int in = 0;
         for (int i = 0; i < enviosEnProceso.size(); i++) {
-
+            
             if (cdt.getCdr().getRondaActual().getNumero() == enviosEnProceso.get(i).getTurnoDestino()) {
                 eventos.add(realizarEnvio(enviosEnProceso.get(i)));
                 enviosRealizados.add(enviosEnProceso.get(i));
@@ -122,6 +123,19 @@ public class ControlDeFlotas {
         }
         return envios;
     }
+    
+    
+        public ArrayList<EnvioDeFlota> obtenerEnviosPendientesDeJugador(Jugador jugador) {
+        ordenarEnvios();
+        ArrayList<EnvioDeFlota> envios = new ArrayList<>();
+        for (int i = 0; i < enviosEnProceso.size(); i++) {
+            if (enviosEnProceso.get(i).getOrdenador() == jugador) {
+                envios.add(enviosEnProceso.get(i));
+            }
+        }
+        return envios;
+    }
+    
 
     public ArrayList<EnvioDeFlota> getEnviosRealizados() {
         return enviosRealizados;
@@ -139,7 +153,7 @@ public class ControlDeFlotas {
     }
 
     private ArrayList<EventoEnvio> obtenerEventosDeHumanos(int ronda) {
-        System.out.println(eventos.size() + "[];[SS");
+        
         ArrayList<EventoEnvio> eventosDeHumano = new ArrayList<>();
         for (int i = 0; i < eventos.size(); i++) {
             if (eventos.get(i).getRonda() == ronda) {
@@ -147,7 +161,7 @@ public class ControlDeFlotas {
                     eventosDeHumano.add(eventos.get(i));
                 } else {
                     if (eventos.get(i).getOrigen().getOwner().getTipo() == Jugador.TIPO_HUMANO
-                            || eventos.get(i).getDestino().getOwner().getTipo() == Jugador.TIPO_HUMANO) {
+                            || (eventos.get(i).getDestino().getOwner()!=null&&eventos.get(i).getDestino().getOwner().getTipo() == Jugador.TIPO_HUMANO)) {
                         eventosDeHumano.add(eventos.get(i));
                     }
                 }
@@ -176,11 +190,12 @@ public class ControlDeFlotas {
                 
                 envio.getDestino().getPlaneta().getOwner().getPlanetas().remove(envio.getDestino().getPlaneta());
             }
-            envio.getOrdenador().agregarPlaneta(envio.getDestino().getPlaneta());
+           
             if (navesRestantes.intValue()==0) {
                 navesRestantes++;
             }
             envio.getDestino().getPlaneta().serConquistado(envio.getOrdenador(), navesRestantes.intValue());
+             envio.getOrdenador().agregarPlaneta(envio.getDestino().getPlaneta());
             return new EventoEnvio(EventoEnvio.TIPO_CONQUISTA, envio.getOrigen().getPlaneta(), envio.getDestino().getPlaneta(), envio.getNaves(), envio.getTurnoDestino(),envio.getOrdenador());
         } else {
             Double navesRestantes = (defensaDestino - ataqueOrigen) / envio.getDestino().getPlaneta().getPorcentajeMuertes();

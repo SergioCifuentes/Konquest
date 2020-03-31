@@ -669,6 +669,8 @@ public class FramePrincipal extends javax.swing.JFrame {
 
     public boolean isGanador() {
         btnEnvio.setEnabled(true);
+        online=false;
+        
         itemGuardar.setEnabled(false);
         return ganador;
     }
@@ -696,6 +698,7 @@ public class FramePrincipal extends javax.swing.JFrame {
     }
 
     private void resetVariables() {
+        online=false;
         
         primerCasilla = null;
         segundaCasilla = null;

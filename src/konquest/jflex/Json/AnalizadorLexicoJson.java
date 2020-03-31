@@ -703,7 +703,7 @@ public class AnalizadorLexicoJson implements java_cup.runtime.Scanner {
           }
         case 42: break;
         case 14: 
-          { System.out.println("map "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.MAPA, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.MAPA, yycolumn,yyline,yytext());
           }
         case 43: break;
         case 39: 
@@ -727,7 +727,7 @@ public class AnalizadorLexicoJson implements java_cup.runtime.Scanner {
           }
         case 48: break;
         case 10: 
-          { System.out.println("id"+yyline+" "+yycolumn);return new Symbol(SimbolosJson.ID, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.ID, yycolumn,yyline,yytext());
           }
         case 49: break;
         case 23: 
@@ -735,11 +735,11 @@ public class AnalizadorLexicoJson implements java_cup.runtime.Scanner {
           }
         case 50: break;
         case 1: 
-          { System.out.println("ERROR "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.ERROR,yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.ERROR,yycolumn,yyline,yytext());
           }
         case 51: break;
         case 2: 
-          { System.out.println("ENTERO "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.NUMERO, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.NUMERO, yycolumn,yyline,yytext());
           }
         case 52: break;
         case 6: 
@@ -779,7 +779,7 @@ public class AnalizadorLexicoJson implements java_cup.runtime.Scanner {
           }
         case 61: break;
         case 11: 
-          { System.out.println("ID_NOMBRE "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.ID_NOMBRE, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.ID_NOMBRE, yycolumn,yyline,yytext());
           }
         case 62: break;
         case 35: 
@@ -827,19 +827,19 @@ public class AnalizadorLexicoJson implements java_cup.runtime.Scanner {
           }
         case 73: break;
         case 13: 
-          { System.out.println("DECIMAL "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.DECIMAL, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.DECIMAL, yycolumn,yyline,yytext());
           }
         case 74: break;
         case 12: 
-          { System.out.println("ID_MAPA "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.ID_MAPA, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.ID_MAPA, yycolumn,yyline,yytext());
           }
         case 75: break;
         case 17: 
-          { System.out.println("NOMBRE_JUGADOR "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.NOMBRE_JUGADOR, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.NOMBRE_JUGADOR, yycolumn,yyline,yytext());
           }
         case 76: break;
         case 22: 
-          { System.out.println("ta "+yyline+" "+yycolumn);return new Symbol(SimbolosJson.TAMAÑO, yycolumn,yyline,yytext());
+          { return new Symbol(SimbolosJson.TAMAÑO, yycolumn,yyline,yytext());
           }
         case 77: break;
         case 15: 

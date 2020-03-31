@@ -6,25 +6,32 @@
 package konquest.ui;
 
 import java.util.ArrayList;
-import javax.swing.event.RowSorterEvent;
+import javax.swing.JButton;
+import javax.swing.table.DefaultTableModel;
 import konquest.Manejadores.Juego.ControlDeTurnos;
+
 import konquest.Manejadores.Juego.Objetos.EnvioDeFlota;
+import konquest.contrladoresUI.Render;
 
 /**
  *
  * @author sergio
  */
 public class FlotasPendientes extends javax.swing.JDialog {
-private ControlDeTurnos cdt;
-private ArrayList<EnvioDeFlota> envios;
+
+    private ControlDeTurnos cdt;
+    private ArrayList<EnvioDeFlota> envios;
+
     /**
      * Creates new form FlotasPendientes
      */
-    public FlotasPendientes(java.awt.Frame parent, boolean modal,ControlDeTurnos cdt) {
+    public FlotasPendientes(java.awt.Frame parent, boolean modal, ControlDeTurnos cdt) {
         super(parent, modal);
-        this.cdt=cdt;
+        this.cdt = cdt;
         initComponents();
         pedirEnvios();
+        mostrarEnvios();
+        btnCancel.setVisible(false);
     }
 
     /**
@@ -38,24 +45,32 @@ private ArrayList<EnvioDeFlota> envios;
 
         sroll = new javax.swing.JScrollPane();
         tblFlotas = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Flotas Pendientes");
         setType(java.awt.Window.Type.UTILITY);
+
+        sroll.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                srollMouseClicked(evt);
+            }
+        });
 
         tblFlotas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Origen", "Destino", "Naves", "Porcentaje", "Ronda De Llegada", "-"
+                "Origen", "Destino", "Naves", "Porcentaje", "Ronda De Llegada"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Object.class
+                java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Float.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -66,6 +81,11 @@ private ArrayList<EnvioDeFlota> envios;
                 return canEdit [columnIndex];
             }
         });
+        tblFlotas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblFlotasMouseClicked(evt);
+            }
+        });
         sroll.setViewportView(tblFlotas);
         if (tblFlotas.getColumnModel().getColumnCount() > 0) {
             tblFlotas.getColumnModel().getColumn(0).setResizable(false);
@@ -73,48 +93,117 @@ private ArrayList<EnvioDeFlota> envios;
             tblFlotas.getColumnModel().getColumn(2).setResizable(false);
             tblFlotas.getColumnModel().getColumn(3).setResizable(false);
             tblFlotas.getColumnModel().getColumn(4).setResizable(false);
-            tblFlotas.getColumnModel().getColumn(5).setResizable(false);
         }
+
+        jButton1.setText("Ok");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        btnCancel.setText("CancelarEnvio");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(sroll, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(sroll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 673, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(btnCancel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(44, 44, 44)
-                .addComponent(sroll, javax.swing.GroupLayout.DEFAULT_SIZE, 243, Short.MAX_VALUE)
-                .addContainerGap())
+                .addGap(32, 32, 32)
+                .addComponent(sroll, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1)
+                    .addComponent(btnCancel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        this.setVisible(false);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void srollMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_srollMouseClicked
+       
+    }//GEN-LAST:event_srollMouseClicked
+
+    private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
+        cdt.eliminarFlotaDeTurno(envios.get(tblFlotas.getSelectedRow()));
+        pedirEnvios();
+        mostrarEnvios();
+        btnCancel.setVisible(false);
+    }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void tblFlotasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblFlotasMouseClicked
+        
+        if (tblFlotas.getSelectedRow()>=0) {
+            if (envios.get(tblFlotas.getSelectedRow()).getRonda().getNumero()==cdt.getCdr().getRondaActual().getNumero()) {
+                btnCancel.setVisible(true);
+            }else{
+                btnCancel.setVisible(false);
+            }
+        }
+       
+    }//GEN-LAST:event_tblFlotasMouseClicked
+
+  
     /**
      * @param args the command line arguments
      */
+    private void pedirEnvios() {
+        envios = new ArrayList<>();
+        envios.addAll(cdt.getFlotasDeTurno());
 
-
-    private void pedirEnvios(){
-         envios=new ArrayList<>();
         for (int i = cdt.getCdr().getRondaActual().getNumero(); i >= 1; i--) {
-           envios.addAll(cdt.getCdf().obtenerEnviosPorJugador(cdt.getJugadorEnTurnoActual(),i));
+            envios.addAll(cdt.getCdf().obtenerEnviosPorJugador(cdt.getJugadorEnTurnoActual(), i));
         }
-        
+
     }
-    private void mostrarEnvios(){
-        
-        
+
+    private void mostrarEnvios() {
+        tblFlotas.setDefaultRenderer(Object.class, new Render());
+        DefaultTableModel dtm = (DefaultTableModel) tblFlotas.getModel();
+
+        int rows = dtm.getRowCount();
+        for (int i = 0; i < rows; i++) {
+            dtm.removeRow(0);
+        }
+
+        for (int i = 0; i < envios.size(); i++) {
+
+            
+                dtm.addRow(new Object[]{envios.get(i).getOrigen().getPlaneta().getNombre(), envios.get(i).getOrigen().getPlaneta().getNombre(),
+                    envios.get(i).getNaves(), envios.get(i).getOrigen().getPlaneta().getPorcentajeMuertes(),
+                     envios.get(i).getTurnoDestino()});
+            
+
+        }
+
     }
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnCancel;
+    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane sroll;
     private javax.swing.JTable tblFlotas;
     // End of variables declaration//GEN-END:variables

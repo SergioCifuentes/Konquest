@@ -85,6 +85,12 @@ public class ControlDeTurnos {
 
     }
 
+    public void eliminarFlotaDeTurno(EnvioDeFlota en){
+        en.getOrigen().getPlaneta().recibirNavesAleadas(en.getNaves());
+        flotasDeTurno.remove(en);
+        redibujarTablero();
+    }
+    
     public void empezarOnline() {
         flotasDeTurno = new ArrayList<>();
         empezarTurnos();
@@ -102,8 +108,8 @@ public class ControlDeTurnos {
         if (host != null) {
             for (int i = 0; i < jugadoresEnOrden.size(); i++) {
                 if (jugadoresEnOrden.get(i).getTipo() != Jugador.TIPO_HUMANO) {
-                    ManejadorEnemigoPC mepc = new ManejadorEnemigoPC(mapa, jugadoresEnOrden.get(i));
-                    ArrayList<EnvioDeFlota> flotasAux = mepc.realizarAtaques();
+                    ManejadorEnemigoPC mepc = new ManejadorEnemigoPC(mapa, jugadoresEnOrden.get(i),cdr.getRondaActual());
+                    ArrayList<EnvioDeFlota> flotasAux = mepc.realizarAtaques(cdf.obtenerEnviosPendientesDeJugador(jugadorEnTurnoActual));
                     if (!(flotasAux == null) && !(flotasAux.isEmpty())) {
                         cdf.GuardarEnvioPorTurno(flotasAux);
                         for (int j = 0; j < flotasAux.size(); j++) {
@@ -154,7 +160,7 @@ public class ControlDeTurnos {
     }
     
     public void recibirEnviosOnline(ArrayList<EnvioDeFlota> envios){
-        System.out.println("Recibidooooooo "+envios);
+        
         if (!(envios == null) && !(envios.isEmpty())) {
             cdf.GuardarEnvioPorTurno(envios);
             for (int i = 0; i < envios.size(); i++) {
@@ -189,6 +195,7 @@ public class ControlDeTurnos {
     }
 
     public void terminarTurno(ArrayList<EnvioDeFlota> flotas) {
+        
         if (!(flotas == null) && !(flotas.isEmpty())) {
             cdf.GuardarEnvioPorTurno(flotas);
         }
@@ -223,8 +230,9 @@ public class ControlDeTurnos {
                 if (jugadorEnTurnoActual.getTipo() == Jugador.TIPO_HUMANO) {
                     mandarInfoAFram();
                 } else {
-                    ManejadorEnemigoPC mepc = new ManejadorEnemigoPC(mapa, jugadorEnTurnoActual);
-                    terminarTurno(mepc.realizarAtaques());
+                    
+                    ManejadorEnemigoPC mepc = new ManejadorEnemigoPC(mapa, jugadorEnTurnoActual,cdr.getRondaActual());
+                    terminarTurno(mepc.realizarAtaques(cdf.obtenerEnviosPendientesDeJugador(jugadorEnTurnoActual)));
                     redibujarTablero();
                 }
             } else {
@@ -258,6 +266,10 @@ public class ControlDeTurnos {
         redibujarTablero();
         flotasDeTurno.add(edf);
         fp.pedirPrimerPlaneta();
+    }
+
+    public ArrayList<EnvioDeFlota> getFlotasDeTurno() {
+        return flotasDeTurno;
     }
 
     public void redibujarTablero() {

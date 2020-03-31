@@ -68,9 +68,6 @@ public class EnviosOnline {
         public ArrayList<EnvioDeFlota> convertitEnviosReplayAEnvios(ArrayList<EnvioReplay> envios,Ronda ronda) {
         ArrayList<EnvioDeFlota> enviosFlota = new ArrayList<>();
         for (int i = 0; i < envios.size(); i++) {
-            System.out.println(envios.get(i).getNaves());
-            System.out.println(envios.get(i).getDestino());
-            System.out.println(envios.get(i).getOrigen());
             Planeta origen = obtenerPlaneta(envios.get(i).getOrigen());
             Casilla casillaOrigen = obtenerCasilla(origen);
             

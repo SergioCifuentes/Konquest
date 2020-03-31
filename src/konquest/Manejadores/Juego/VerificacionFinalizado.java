@@ -30,12 +30,10 @@ public class VerificacionFinalizado {
         for (int i = 0; i < mapa.getJugadores().size(); i++) {
             if (mapa.getJugadores().get(i).isVivo()) {
                 ganadores.add(mapa.getJugadores().get(i));
-                System.out.println("vivo: "+mapa.getJugadores().get(i));
+                
                 vivos++;
             }
         }
-        System.out.println("=====");
-        System.out.println("&&&&"+ganadores.get(0).getPlanetas().size()+"&&&"+mapa.getPlanetas().size()+" "+mapa.getPlanetasNeutrales().size());
         if (vivos>1) {
             ganadores.removeAll(ganadores);
         }
@@ -78,7 +76,7 @@ public class VerificacionFinalizado {
                 if (EstadisticasJugador.verificarNavesExistentes(jugadores.get(i), enviosPendientes)==0) {
                     jugadores.get(i).setVivo(false);
                 }
-                System.out.println("");
+                
             }
         }
     }

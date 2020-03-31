@@ -37,7 +37,7 @@ public class Cliente implements Runnable{
             Socket sc = new Socket(host, puerto);
             DataOutputStream out=null;
             out = new DataOutputStream(sc.getOutputStream());
-            System.out.println(mensaje+" A enviar");
+            
             out.writeUTF(mensaje);
             sc.close(); 
         } catch (IOException ex) {
